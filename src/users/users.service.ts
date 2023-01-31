@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from './Entities/user.entitie';
+import { ResponseUser, User } from './Entities/user.entitie';
 import { AddUserDto } from './dto/add-user.dto';
 import { v4 as uuid4 } from 'uuid';
 import { Constants } from '../constants';
@@ -12,11 +12,13 @@ import { cleanUpEntity } from '../utils/helpers';
 
 @Injectable()
 export class UsersService {
-  users: User[] = [];
-  getAllUsers(): User[] {
-    return this.users;
+  private users: User[] = [];
+  public getAllUsers() {
+    return this.users.map((user) =>
+      cleanUpEntity<User, 'password'>(user, 'password'),
+    );
   }
-  getOneUser(id: string): User {
+  private _findOneUser(id: string): User {
     const user = this.users.find((user) => user.id === id);
 
     if (!user) {
@@ -25,7 +27,17 @@ export class UsersService {
 
     return user;
   }
-  addUser(userData: AddUserDto) {
+
+  public getOneUser(id: string): ResponseUser {
+    const user = this.users.find((user) => user.id === id);
+
+    if (!user) {
+      throw new NotFoundException(Constants.USER_ERROR);
+    }
+
+    return cleanUpEntity<typeof user, 'password'>(user, 'password');
+  }
+  public addUser(userData: AddUserDto): ResponseUser {
     const stamp = Date.now();
     const newUser = {
       id: uuid4(),
@@ -37,14 +49,14 @@ export class UsersService {
 
     this.users.push(newUser);
 
-    return cleanUpEntity(newUser);
+    return cleanUpEntity<typeof newUser, 'password'>(newUser, 'password');
   }
-  deleteUser(id: string) {
-    this.getOneUser(id);
+  public deleteUser(id: string): void {
+    this._findOneUser(id);
     this.users = this.users.filter((user) => user.id !== id);
   }
-  updateUser(id: string, updateUserData: UpdateUserDto) {
-    const user = this.getOneUser(id);
+  public updateUser(id: string, updateUserData: UpdateUserDto): ResponseUser {
+    const user = this._findOneUser(id);
 
     if (user.password !== updateUserData.oldPassword) {
       throw new ForbiddenException(Constants.USER_UNAUTHORIZED);
@@ -56,6 +68,6 @@ export class UsersService {
     user.updatedAt = Date.now();
     this.users.push(user);
 
-    return cleanUpEntity(user);
+    return cleanUpEntity<typeof user, 'password'>(user, 'password');
   }
 }
