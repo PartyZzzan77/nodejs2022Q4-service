@@ -49,29 +49,29 @@ describe('Users (e2e)', () => {
       expect(response.body).toBeInstanceOf(Array);
     });
 
-    // it('should correctly get user by id', async () => {
-    //   const creationResponse = await unauthorizedRequest
-    //     .post(usersRoutes.create)
-    //     .set(commonHeaders)
-    //     .send(createUserDto);
-    //
-    //   const { id } = creationResponse.body;
-    //
-    //   expect(creationResponse.statusCode).toBe(StatusCodes.CREATED);
-    //
-    //   const searchResponse = await unauthorizedRequest
-    //     .get(usersRoutes.getById(id))
-    //     .set(commonHeaders);
-    //
-    //   expect(searchResponse.statusCode).toBe(StatusCodes.OK);
-    //   expect(searchResponse.body).toBeInstanceOf(Object);
-    //
-    //   const cleanupResponse = await unauthorizedRequest
-    //     .delete(usersRoutes.delete(id))
-    //     .set(commonHeaders);
-    //
-    //   expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
-    // });
+    it('should correctly get user by id', async () => {
+      const creationResponse = await unauthorizedRequest
+        .post(usersRoutes.create)
+        .set(commonHeaders)
+        .send(createUserDto);
+
+      const { id } = creationResponse.body;
+
+      expect(creationResponse.statusCode).toBe(StatusCodes.CREATED);
+
+      const searchResponse = await unauthorizedRequest
+        .get(usersRoutes.getById(id))
+        .set(commonHeaders);
+
+      expect(searchResponse.statusCode).toBe(StatusCodes.OK);
+      expect(searchResponse.body).toBeInstanceOf(Object);
+
+      // const cleanupResponse = await unauthorizedRequest
+      //   .delete(usersRoutes.delete(id))
+      //   .set(commonHeaders);
+      //
+      // expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
+    });
 
     // it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
     //   const response = await unauthorizedRequest
