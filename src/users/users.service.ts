@@ -34,4 +34,8 @@ export class UsersService {
 
     return newUser;
   }
+  deleteUser(id: string) {
+    this.getOneUser(id);
+    this.users = this.users.filter((user) => user.id !== id);
+  }
 }
