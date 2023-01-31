@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { User } from './Entities/user.entitie';
 import { UsersService } from './users.service';
 import { AddUserDto } from './dto/add-user.dto';
+import { UserIdDto } from './dto/user-id.dto';
 
 @Controller('user')
 export class UsersController {
@@ -11,8 +12,8 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
   @Get(':id')
-  getOneUser(@Param('id') id: string): User {
-    return this.usersService.getOneUser(id);
+  getOneUser(@Param() userId: UserIdDto): User {
+    return this.usersService.getOneUser(userId.id);
   }
   @Post()
   addUser(@Body() userData: AddUserDto): Omit<User, 'password'> {

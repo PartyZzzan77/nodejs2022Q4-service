@@ -73,21 +73,21 @@ describe('Users (e2e)', () => {
       // expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
     });
 
-    // it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
-    //   const response = await unauthorizedRequest
-    //     .get(usersRoutes.getById('some-invalid-id'))
-    //     .set(commonHeaders);
-    //
-    //   expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-    // });
+    it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
+      const response = await unauthorizedRequest
+        .get(usersRoutes.getById('some-invalid-id'))
+        .set(commonHeaders);
 
-    // it("should respond with NOT_FOUND status code in case if user doesn't exist", async () => {
-    //   const response = await unauthorizedRequest
-    //     .get(usersRoutes.getById(randomUUID))
-    //     .set(commonHeaders);
-    //
-    //   expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    // });
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it("should respond with NOT_FOUND status code in case if user doesn't exist", async () => {
+      const response = await unauthorizedRequest
+        .get(usersRoutes.getById(randomUUID))
+        .set(commonHeaders);
+
+      expect(response.status).toBe(StatusCodes.NOT_FOUND);
+    });
   });
 
   describe('POST', () => {
