@@ -4,10 +4,11 @@ import { Constants } from '../constants';
 import { v4 as uuid4 } from 'uuid';
 import { AddTrackDto } from './dto/add-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { db } from '../DB/db.service';
 
 @Injectable()
 export class TracksService {
-  private tracks: Track[] = [];
+  private tracks: Track[] = db.tracks;
 
   public getAllTracks(): Track[] {
     return this.tracks;

@@ -8,10 +8,11 @@ import { AddUserDto } from './dto/add-user.dto';
 import { v4 as uuid4 } from 'uuid';
 import { Constants } from '../constants';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { db } from '../DB/db.service';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  private users: User[] = db.users;
   public getAllUsers(): User[] {
     return this.users.map((user) => new User(user));
   }
