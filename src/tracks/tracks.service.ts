@@ -3,6 +3,7 @@ import { Track } from './Entities/track.entitie';
 import { Constants } from '../constants';
 import { v4 as uuid4 } from 'uuid';
 import { AddTrackDto } from './dto/add-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Injectable()
 export class TracksService {
@@ -34,5 +35,13 @@ export class TracksService {
     const track = this.getOneTrack(id);
     this.tracks = this.tracks.filter((track) => track.id !== id);
     return track.id;
+  }
+  public updateTrack(id: string, updateTrackData: UpdateTrackDto): Track {
+    const track = this.getOneTrack(id);
+    this.deleteTrack(id);
+    const updatedTrack = { ...track, ...updateTrackData };
+    this.tracks.push(updatedTrack);
+
+    return updatedTrack;
   }
 }
