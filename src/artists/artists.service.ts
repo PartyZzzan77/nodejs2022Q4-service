@@ -11,7 +11,6 @@ export class ArtistsService {
   private artists: Artist[] = db.artists;
 
   public getAllArtists(): Artist[] {
-    console.log(db.tracks);
     return this.artists;
   }
   public getOneArtist(id: string): Artist {
