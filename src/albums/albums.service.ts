@@ -30,4 +30,16 @@ export class AlbumsService {
 
     return newAlbum;
   }
+  public deleteAlbum(id: string): string {
+    const album = this.getOneAlbum(id);
+    this.albums = this.albums.filter((album) => album.id !== id);
+
+    db.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
+
+    return album.id;
+  }
 }
