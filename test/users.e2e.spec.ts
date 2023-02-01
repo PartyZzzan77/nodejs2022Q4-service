@@ -98,7 +98,6 @@ describe('Users (e2e)', () => {
         .send(createUserDto);
 
       const { id, version, login, createdAt, updatedAt } = response.body;
-      console.log(response.body);
 
       expect(response.status).toBe(StatusCodes.CREATED);
 

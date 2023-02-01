@@ -7,8 +7,10 @@ import {
   Body,
   Delete,
   HttpCode,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { ResponseUser, User } from './Entities/user.entitie';
+import { User } from './Entities/user.entitie';
 import { UsersService } from './users.service';
 import { AddUserDto } from './dto/add-user.dto';
 import { UserIdDto } from './dto/user-id.dto';
@@ -17,28 +19,33 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  getAllUsers(): Omit<User, 'password'>[] {
+  getAllUsers(): User[] {
     return this.usersService.getAllUsers();
   }
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  getOneUser(@Param() userId: UserIdDto): ResponseUser {
+  getOneUser(@Param() userId: UserIdDto): User {
     return this.usersService.getOneUser(userId.id);
   }
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  addUser(@Body() userData: AddUserDto): ResponseUser {
+  addUser(@Body() userData: AddUserDto): User {
     return this.usersService.addUser(userData);
   }
+  @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   @HttpCode(204)
-  deleteUser(@Param() userId: UserIdDto) {
+  deleteUser(@Param() userId: UserIdDto): void {
     return this.usersService.deleteUser(userId.id);
   }
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   updateUser(
     @Param() userId: UserIdDto,
     @Body() updateUserData: UpdateUserDto,
-  ): ResponseUser {
+  ): User {
     return this.usersService.updateUser(userId.id, updateUserData);
   }
 }
