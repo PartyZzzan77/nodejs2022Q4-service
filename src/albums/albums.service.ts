@@ -4,6 +4,7 @@ import { db } from '../DB/db.service';
 import { Constants } from '../constants';
 import { v4 as uuid4 } from 'uuid';
 import { AddAlbumDto } from './dto/add-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
@@ -41,5 +42,14 @@ export class AlbumsService {
     });
 
     return album.id;
+  }
+
+  public updateAlbum(id: string, updateAlbumData: UpdateAlbumDto): Album {
+    const album = this.getOneAlbum(id);
+    this.deleteAlbum(id);
+    const updatedAlbum = { ...album, ...updateAlbumData };
+    this.albums.push(updatedAlbum);
+
+    return updatedAlbum;
   }
 }
