@@ -12,13 +12,12 @@ import { db } from '../DB/db.service';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = db.users;
   public getAllUsers(): User[] {
-    return this.users.map((user) => new User(user));
+    return db.users.map((user) => new User(user));
   }
 
   public getOneUser(id: string): User {
-    const user = this.users.find((user) => user.id === id);
+    const user = db.users.find((user) => user.id === id);
 
     if (!user) {
       throw new NotFoundException(Constants.USER_ERROR);
@@ -36,13 +35,13 @@ export class UsersService {
       ...userData,
     };
 
-    this.users.push(newUser);
+    db.users.push(newUser);
 
     return new User(newUser);
   }
   public deleteUser(id: string): void {
     this.getOneUser(id);
-    this.users = this.users.filter((user) => user.id !== id);
+    db.users = db.users.filter((user) => user.id !== id);
   }
   public updateUser(id: string, updateUserData: UpdateUserDto): User {
     const user = this.getOneUser(id);
@@ -55,7 +54,7 @@ export class UsersService {
     user.password = updateUserData.newPassword;
     user.version += 1;
     user.updatedAt = Date.now();
-    this.users.push(user);
+    db.users.push(user);
 
     return new User(user);
   }

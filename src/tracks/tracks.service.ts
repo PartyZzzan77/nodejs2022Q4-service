@@ -8,13 +8,11 @@ import { db } from '../DB/db.service';
 
 @Injectable()
 export class TracksService {
-  private tracks: Track[] = db.tracks;
-
   public getAllTracks(): Track[] {
-    return this.tracks;
+    return db.tracks;
   }
   public getOneTrack(id: string): Track {
-    const track = this.tracks.find((track) => track.id === id);
+    const track = db.tracks.find((track) => track.id === id);
 
     if (!track) {
       throw new NotFoundException(Constants.TRACK_ERROR);
@@ -28,20 +26,21 @@ export class TracksService {
       ...trackData,
     };
 
-    this.tracks.push(newTrack);
+    db.tracks.push(newTrack);
 
     return newTrack;
   }
   public deleteTrack(id: string): string {
     const track = this.getOneTrack(id);
-    this.tracks = this.tracks.filter((track) => track.id !== id);
+    db.tracks = db.tracks.filter((track) => track.id !== id);
+    db.favorites.tracks = db.favorites.tracks.filter((t) => t.id !== track.id);
     return track.id;
   }
   public updateTrack(id: string, updateTrackData: UpdateTrackDto): Track {
     const track = this.getOneTrack(id);
     this.deleteTrack(id);
     const updatedTrack = { ...track, ...updateTrackData };
-    this.tracks.push(updatedTrack);
+    db.tracks.push(updatedTrack);
 
     return updatedTrack;
   }

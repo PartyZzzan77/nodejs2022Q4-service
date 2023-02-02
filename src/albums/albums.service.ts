@@ -8,12 +8,11 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
-  private albums: Album[] = db.albums;
   public getAllAlbums(): Album[] {
-    return this.albums;
+    return db.albums;
   }
   public getOneAlbum(id: string): Album {
-    const album = this.albums.find((album) => album.id === id);
+    const album = db.albums.find((album) => album.id === id);
 
     if (!album) {
       throw new NotFoundException(Constants.ALBUM_ERROR);
@@ -27,19 +26,20 @@ export class AlbumsService {
       ...albumData,
     };
 
-    this.albums.push(newAlbum);
+    db.albums.push(newAlbum);
 
     return newAlbum;
   }
   public deleteAlbum(id: string): string {
     const album = this.getOneAlbum(id);
-    this.albums = this.albums.filter((album) => album.id !== id);
+    db.albums = db.albums.filter((album) => album.id !== id);
 
     db.tracks.forEach((track) => {
-      if (track.albumId === id) {
+      if (track.albumId === album.id) {
         track.albumId = null;
       }
     });
+    db.favorites.albums = db.favorites.albums.filter((a) => a.id !== album.id);
 
     return album.id;
   }
@@ -48,7 +48,7 @@ export class AlbumsService {
     const album = this.getOneAlbum(id);
     this.deleteAlbum(id);
     const updatedAlbum = { ...album, ...updateAlbumData };
-    this.albums.push(updatedAlbum);
+    db.albums.push(updatedAlbum);
 
     return updatedAlbum;
   }

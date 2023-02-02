@@ -10,9 +10,9 @@ class DbService {
   artists: Artist[] = [];
   albums: Album[] = [];
   favorites: Favorite = {
-    tracks: this.tracks,
-    artists: this.artists,
-    albums: this.albums,
+    tracks: [],
+    artists: [],
+    albums: [],
   };
 }
 

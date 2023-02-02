@@ -8,13 +8,11 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Injectable()
 export class ArtistsService {
-  private artists: Artist[] = db.artists;
-
   public getAllArtists(): Artist[] {
-    return this.artists;
+    return db.artists;
   }
   public getOneArtist(id: string): Artist {
-    const artist = this.artists.find((artist) => artist.id === id);
+    const artist = db.artists.find((artist) => artist.id === id);
 
     if (!artist) {
       throw new NotFoundException(Constants.ARTIST_ERROR);
@@ -28,13 +26,13 @@ export class ArtistsService {
       ...artistData,
     };
 
-    this.artists.push(newArtist);
+    db.artists.push(newArtist);
 
     return newArtist;
   }
   public deleteArtist(id: string): string {
     const artist = this.getOneArtist(id);
-    this.artists = this.artists.filter((artist) => artist.id !== id);
+    db.artists = db.artists.filter((artist) => artist.id !== id);
 
     db.tracks.forEach((track) => {
       if (track.artistId === id) {
@@ -42,13 +40,17 @@ export class ArtistsService {
       }
     });
 
+    db.favorites.artists = db.favorites.artists.filter(
+      (a) => a.id !== artist.id,
+    );
+
     return artist.id;
   }
   public updateArtist(id: string, updateArtistData: UpdateArtistDto): Artist {
     const artist = this.getOneArtist(id);
     this.deleteArtist(id);
     const updatedArtist = { ...artist, ...updateArtistData };
-    this.artists.push(updatedArtist);
+    db.artists.push(updatedArtist);
 
     return updatedArtist;
   }
