@@ -10,8 +10,8 @@ import { FavoritesModule } from './favorites/favorites.module';
 @Module({
   imports: [
     UsersModule,
-    TracksModule,
     AlbumsModule,
+    TracksModule,
     ArtistsModule,
     FavoritesModule,
   ],

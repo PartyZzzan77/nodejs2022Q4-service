@@ -27,7 +27,10 @@ npm i
 npm run start
 ```
 
-After running the application on the port (4000 by default) you can open the attached collection at the root of the project and use the endpoins
+After running the application on the port (4000 by default) you can open a subcollection at the root of the project and use the endpoints or use the documentation at:
+```md
+http://localhost:4000/doc
+```
 
 ## Testing
 
