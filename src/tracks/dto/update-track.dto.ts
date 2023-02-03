@@ -2,22 +2,22 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateTrackDto {
-  @ApiProperty()
+  @ApiProperty({ default: 'Cosmic Girl radio edit' })
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: null })
   @IsOptional()
   @IsString()
   artistId: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: null })
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   albumId: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: 207 })
   @IsNumber()
   duration: number;
 }

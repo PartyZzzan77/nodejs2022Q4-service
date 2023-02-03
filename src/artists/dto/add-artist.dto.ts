@@ -2,11 +2,11 @@ import { IsBoolean, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddArtistDto {
-  @ApiProperty()
+  @ApiProperty({ default: 'Jamiroquai' })
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: true })
   @IsBoolean()
   grammy: boolean;
 }

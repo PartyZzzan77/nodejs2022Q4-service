@@ -2,16 +2,16 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AddAlbumDto {
-  @ApiProperty()
+  @ApiProperty({ default: 'Dynamite' })
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: 2005 })
   @IsNumber()
   year: number;
 
   @ApiProperty()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ default: null })
   @IsOptional()
   @IsString()
   artistId?: string;

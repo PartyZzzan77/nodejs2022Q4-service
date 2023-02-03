@@ -1,18 +1,23 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AddTrackDto {
-  @ApiProperty()
+  @ApiProperty({ default: 'Cosmic Girl' })
   @IsString()
   name: string;
+
+  @ApiProperty({ default: 241 })
   @IsNumber()
-  @ApiProperty()
   duration: number;
 
+  @ApiProperty({ type: AddTrackDto, default: null })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   artistId?: null;
 
+  @ApiProperty({ type: AddTrackDto, default: null })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   albumId?: null;

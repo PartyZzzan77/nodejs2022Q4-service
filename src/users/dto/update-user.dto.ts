@@ -2,11 +2,11 @@ import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto {
-  @ApiProperty()
+  @ApiProperty({ default: '12345678' })
   @IsString()
   oldPassword: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: '87654321' })
   @IsString()
   newPassword: string;
 }
