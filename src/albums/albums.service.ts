@@ -1,55 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Album } from './Entities/album.entities';
-import { db } from '../DB/db.service';
-import { Constants } from '../constants';
-import { v4 as uuid4 } from 'uuid';
-import { AddAlbumDto } from './dto/add-album.dto';
-import { UpdateAlbumDto } from './dto/update-album.dto';
+import { Injectable } from '@nestjs/common';
+import {
+  CreateParams,
+  Entity,
+  FindOneParams,
+  Storage,
+} from '../repository/types';
+import { RepositoryService } from '../repository/repository.service';
 
 @Injectable()
 export class AlbumsService {
-  public getAllAlbums(): Album[] {
-    return db.albums;
+  constructor(public repository: RepositoryService) {}
+  public find(key: Storage) {
+    return this.repository.find(key);
   }
-  public getOneAlbum(id: string): Album {
-    const album = db.albums.find((album) => album.id === id);
+  public findOne({ key, id }: FindOneParams): Entity | null {
+    const album = this.repository.findOne({ key, id });
 
     if (!album) {
-      throw new NotFoundException(Constants.ALBUM_ERROR);
+      return null;
     }
 
     return album;
   }
-  public addAlbum(albumData: AddAlbumDto): Album {
-    const newAlbum = {
-      id: uuid4(),
-      ...albumData,
-    };
-
-    db.albums.push(newAlbum);
-
-    return newAlbum;
+  public create({ key, dto }: CreateParams) {
+    return this.repository.create({ key, dto });
   }
-  public deleteAlbum(id: string): string {
-    const album = this.getOneAlbum(id);
-    db.albums = db.albums.filter((album) => album.id !== id);
-
-    db.tracks.forEach((track) => {
-      if (track.albumId === album.id) {
-        track.albumId = null;
-      }
-    });
-    db.favorites.albums = db.favorites.albums.filter((a) => a.id !== album.id);
-
-    return album.id;
+  public delete({ key, id }) {
+    const albumId = this.repository.delete({ key, id });
+    this.repository.cleanUpTrackAlbumId(albumId);
+    this.repository.cleaUpFavorites({ key, id: albumId });
+    return albumId;
   }
-
-  public updateAlbum(id: string, updateAlbumData: UpdateAlbumDto): Album {
-    const album = this.getOneAlbum(id);
-    this.deleteAlbum(id);
-    const updatedAlbum = { ...album, ...updateAlbumData };
-    db.albums.push(updatedAlbum);
-
-    return updatedAlbum;
+  public update({ key, id, dto }) {
+    return this.repository.update({ key, id, dto });
   }
 }

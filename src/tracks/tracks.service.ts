@@ -1,47 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Track } from './Entities/track.entitie';
-import { Constants } from '../constants';
-import { v4 as uuid4 } from 'uuid';
-import { AddTrackDto } from './dto/add-track.dto';
-import { UpdateTrackDto } from './dto/update-track.dto';
-import { db } from '../DB/db.service';
+import {
+  CreateParams,
+  Entity,
+  FindOneParams,
+  Storage,
+} from '../repository/types';
+import { RepositoryService } from '../repository/repository.service';
 
 @Injectable()
 export class TracksService {
-  public getAllTracks(): Track[] {
-    return db.tracks;
+  constructor(public repository: RepositoryService) {}
+  public find(key: Storage): Track[] {
+    return this.repository.find(key);
   }
-  public getOneTrack(id: string): Track {
-    const track = db.tracks.find((track) => track.id === id);
+  public findOne({ key, id }: FindOneParams): Entity | null {
+    const track = this.repository.findOne({ key, id });
 
     if (!track) {
-      throw new NotFoundException(Constants.TRACK_ERROR);
+      return null;
     }
 
     return track;
   }
-  public addTrack(trackData: AddTrackDto): Track {
-    const newTrack = {
-      id: uuid4(),
-      ...trackData,
-    };
-
-    db.tracks.push(newTrack);
-
-    return newTrack;
+  public create({ key, dto }: CreateParams) {
+    return this.repository.create({ key, dto });
   }
-  public deleteTrack(id: string): string {
-    const track = this.getOneTrack(id);
-    db.tracks = db.tracks.filter((track) => track.id !== id);
-    db.favorites.tracks = db.favorites.tracks.filter((t) => t.id !== track.id);
-    return track.id;
+  public delete({ key, id }) {
+    const trackId = this.repository.delete({ key, id });
+    this.repository.cleaUpFavorites({ key, id });
+    return trackId;
   }
-  public updateTrack(id: string, updateTrackData: UpdateTrackDto): Track {
-    const track = this.getOneTrack(id);
-    this.deleteTrack(id);
-    const updatedTrack = { ...track, ...updateTrackData };
-    db.tracks.push(updatedTrack);
-
-    return updatedTrack;
+  public update({ key, id, dto }) {
+    return this.repository.update({ key, id, dto });
   }
 }

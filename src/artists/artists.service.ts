@@ -1,57 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from './Entities/atrtist.entities';
-import { v4 as uuid4 } from 'uuid';
-import { AddArtistDto } from './dto/add-artist.dto';
-import { Constants } from '../constants';
-import { db } from '../DB/db.service';
-import { UpdateArtistDto } from './dto/update-artist.dto';
+import { Injectable } from '@nestjs/common';
+import {
+  CreateParams,
+  Entity,
+  FindOneParams,
+  Storage,
+} from '../repository/types';
+import { RepositoryService } from '../repository/repository.service';
 
 @Injectable()
 export class ArtistsService {
-  public getAllArtists(): Artist[] {
-    return db.artists;
+  constructor(public repository: RepositoryService) {}
+  public find(key: Storage) {
+    return this.repository.find(key);
   }
-  public getOneArtist(id: string): Artist {
-    const artist = db.artists.find((artist) => artist.id === id);
+  public findOne({ key, id }: FindOneParams): Entity | null {
+    const album = this.repository.findOne({ key, id });
 
-    if (!artist) {
-      throw new NotFoundException(Constants.ARTIST_ERROR);
+    if (!album) {
+      return null;
     }
 
-    return artist;
+    return album;
   }
-  public addArtist(artistData: AddArtistDto): Artist {
-    const newArtist = {
-      id: uuid4(),
-      ...artistData,
-    };
-
-    db.artists.push(newArtist);
-
-    return newArtist;
+  public create({ key, dto }: CreateParams) {
+    return this.repository.create({ key, dto });
   }
-  public deleteArtist(id: string): string {
-    const artist = this.getOneArtist(id);
-    db.artists = db.artists.filter((artist) => artist.id !== id);
-
-    db.tracks.forEach((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
-    });
-
-    db.favorites.artists = db.favorites.artists.filter(
-      (a) => a.id !== artist.id,
-    );
-
-    return artist.id;
+  public delete({ key, id }) {
+    const artistId = this.repository.delete({ key, id });
+    this.repository.cleanUpTrackArtistId(artistId);
+    this.repository.cleaUpFavorites({ key, id: artistId });
+    return artistId;
   }
-  public updateArtist(id: string, updateArtistData: UpdateArtistDto): Artist {
-    const artist = this.getOneArtist(id);
-    this.deleteArtist(id);
-    const updatedArtist = { ...artist, ...updateArtistData };
-    db.artists.push(updatedArtist);
-
-    return updatedArtist;
+  public update({ key, id, dto }) {
+    return this.repository.update({ key, id, dto });
   }
 }
