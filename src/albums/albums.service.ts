@@ -28,7 +28,7 @@ export class AlbumsService {
   public delete({ key, id }) {
     const albumId = this.repository.delete({ key, id });
     this.repository.cleanUpTrackAlbumId(albumId);
-    this.repository.cleaUpFavorites({ key, id: albumId });
+    this.repository.cleanUpFavorites({ key, id: albumId });
     return albumId;
   }
   public update({ key, id, dto }) {

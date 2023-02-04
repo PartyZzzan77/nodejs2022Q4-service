@@ -28,7 +28,7 @@ export class TracksService {
   }
   public delete({ key, id }) {
     const trackId = this.repository.delete({ key, id });
-    this.repository.cleaUpFavorites({ key, id });
+    this.repository.cleanUpFavorites({ key, id });
     return trackId;
   }
   public update({ key, id, dto }) {

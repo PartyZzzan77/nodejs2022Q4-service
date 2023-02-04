@@ -145,7 +145,7 @@ export class RepositoryService {
     });
   };
 
-  public cleaUpFavorites({ key, id }: FindOneParams) {
+  public cleanUpFavorites({ key, id }: FindOneParams) {
     this.favorites[key] = this.favorites[key].filter((el) => el.id !== id);
   }
 }

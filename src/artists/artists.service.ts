@@ -28,7 +28,7 @@ export class ArtistsService {
   public delete({ key, id }) {
     const artistId = this.repository.delete({ key, id });
     this.repository.cleanUpTrackArtistId(artistId);
-    this.repository.cleaUpFavorites({ key, id: artistId });
+    this.repository.cleanUpFavorites({ key, id: artistId });
     return artistId;
   }
   public update({ key, id, dto }) {
