@@ -2,6 +2,7 @@ import { ConnectionOptions } from 'typeorm';
 import { User } from './users/Entities/user.entitie';
 import { Track } from './tracks/Entities/track.entitie';
 import { Album } from './albums/Entities/album.entities';
+import { Artist } from './artists/Entities/atrtist.entities';
 
 export const ormConfig: ConnectionOptions = {
   type: 'postgres',
@@ -9,6 +10,6 @@ export const ormConfig: ConnectionOptions = {
   username: 'tester',
   password: 'tester',
   database: 'music',
-  entities: [User, Track, Album],
+  entities: [User, Track, Album, Artist],
   synchronize: true,
 };
