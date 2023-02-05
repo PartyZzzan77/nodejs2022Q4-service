@@ -1,10 +1,12 @@
 import { ConnectionOptions } from 'typeorm';
+import { User } from './users/Entities/user.entitie';
 
 export const ormConfig: ConnectionOptions = {
   type: 'postgres',
   host: 'localhost',
-  port: 5432,
   username: 'tester',
   password: 'tester',
   database: 'music',
+  entities: [User],
+  synchronize: true,
 };
