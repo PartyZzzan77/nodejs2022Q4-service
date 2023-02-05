@@ -30,7 +30,7 @@ import {
 } from '../users/Entities/user.entitie';
 
 @Controller('artist')
-@ApiTags('Arrtist')
+@ApiTags('Artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
@@ -44,8 +44,8 @@ export class ArtistsController {
     description: 'Successful operation',
   })
   @Get()
-  find() {
-    return this.artistsService.find('artists');
+  async find(): Promise<Artist[]> {
+    return await this.artistsService.find();
   }
 
   @ApiOperation({

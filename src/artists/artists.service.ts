@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CreateParams,
-  Entity,
-  FindOneParams,
-  Storage,
-} from '../repository/types';
+import { CreateParams, Entity, FindOneParams } from '../repository/types';
 import { RepositoryService } from '../repository/repository.service';
+import { Repository } from 'typeorm';
+import { Artist } from './Entities/atrtist.entities';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ArtistsService {
-  constructor(public repository: RepositoryService) {}
-  public find(key: Storage) {
-    return this.repository.find(key);
+  constructor(
+    @InjectRepository(Artist)
+    private readonly artistsRepository: Repository<Artist>,
+    public repository: RepositoryService,
+  ) {}
+  public async find(): Promise<Artist[]> {
+    return await this.artistsRepository.find();
   }
   public findOne({ key, id }: FindOneParams): Entity | null {
     const album = this.repository.findOne({ key, id });

@@ -42,8 +42,8 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [User] })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  find() {
-    return this.usersService.find('users');
+  async find(): Promise<User[]> {
+    return await this.usersService.find();
   }
 
   @ApiOperation({ summary: 'Get single user by id' })

@@ -41,8 +41,8 @@ export class TracksController {
     description: 'Successful operation',
   })
   @Get()
-  find() {
-    return this.trackService.find('tracks');
+  async find(): Promise<Track[]> {
+    return await this.trackService.find();
   }
   @ApiOperation({
     summary: `Add new track`,

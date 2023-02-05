@@ -44,8 +44,8 @@ export class AlbumsController {
     description: 'Successful operation',
   })
   @Get()
-  find() {
-    return this.albumsService.find('albums');
+  async find(): Promise<Album[]> {
+    return await this.albumsService.find();
   }
 
   @ApiOperation({

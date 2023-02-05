@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Track } from './Entities/track.entitie';
-import {
-  CreateParams,
-  Entity,
-  FindOneParams,
-  Storage,
-} from '../repository/types';
+import { CreateParams, Entity, FindOneParams } from '../repository/types';
 import { RepositoryService } from '../repository/repository.service';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TracksService {
-  constructor(public repository: RepositoryService) {}
-  public find(key: Storage): Track[] {
-    return this.repository.find(key);
+  constructor(
+    @InjectRepository(Track)
+    private readonly tracksRepository: Repository<Track>,
+    public repository: RepositoryService,
+  ) {}
+  public async find(): Promise<Track[]> {
+    return await this.tracksRepository.find();
   }
   public findOne({ key, id }: FindOneParams): Entity | null {
     const track = this.repository.findOne({ key, id });
