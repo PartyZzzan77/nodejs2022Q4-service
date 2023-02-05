@@ -12,7 +12,12 @@ import {
   Put,
   ForbiddenException,
 } from '@nestjs/common';
-import { User } from './Entities/user.entitie';
+import {
+  BadRequestUUID,
+  Invalid,
+  NotFound,
+  User,
+} from './Entities/user.entitie';
 import { UsersService } from './users.service';
 import { AddUserDto } from './dto/add-user.dto';
 import { UserIdDto } from './dto/user-id.dto';
@@ -27,7 +32,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 @Controller('user')
@@ -36,9 +40,6 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @ApiOperation({ summary: 'Gets all users' })
   @ApiResponse({ status: 200, type: [User] })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   find() {
@@ -48,12 +49,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Get single user by id' })
   @ApiResponse({ status: 200, type: User, description: 'Successful operation' })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. userId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   findOne(@Param() { id }: UserIdDto) {
@@ -66,15 +65,13 @@ export class UsersController {
   @ApiOperation({ summary: 'Create user' })
   @ApiBody({ type: AddUserDto })
   @ApiCreatedResponse({
-    status: 200,
+    status: 201,
     type: User,
     description: 'The user has been created.',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. body does not contain required fields',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
@@ -90,13 +87,11 @@ export class UsersController {
     description: 'The user has been updated.',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. userId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiForbiddenResponse({ description: 'oldPassowrd is wrong' })
-  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiForbiddenResponse({ type: Invalid, description: 'oldPassowrd is wrong' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   update(@Param() { id }: UserIdDto, @Body() dto: UpdateUserDto) {
@@ -115,13 +110,11 @@ export class UsersController {
     description: 'The user has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. userId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiForbiddenResponse({ description: 'oldPassowrd is wrong' })
-  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiForbiddenResponse({ type: Invalid, description: 'oldPassowrd is wrong' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   @HttpCode(204)

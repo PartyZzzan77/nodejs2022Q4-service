@@ -21,9 +21,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Album } from './Entities/album.entities';
+import {
+  BadRequestUUID,
+  NotFound,
+  RequiredFields,
+} from '../users/Entities/user.entitie';
 
 @Controller('album')
 @ApiTags('Album')
@@ -38,9 +42,6 @@ export class AlbumsController {
     status: 200,
     type: [Album],
     description: 'Successful operation',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
   })
   @Get()
   find() {
@@ -58,10 +59,8 @@ export class AlbumsController {
     description: 'Album is created',
   })
   @ApiBadRequestResponse({
+    type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
   })
   @Post()
   create(@Body() dto: AddAlbumDto) {
@@ -78,12 +77,10 @@ export class AlbumsController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. albumId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Album not found.' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Album not found.' })
   @Get(':id')
   findOne(@Param() { id }: AlbumDtoId) {
     const album = this.albumsService.findOne({ key: 'albums', id });
@@ -103,12 +100,10 @@ export class AlbumsController {
     description: 'The album has been updated.',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. albumId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Album not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Put(':id')
   update(@Param() { id }: AlbumDtoId, @Body() dto: UpdateAlbumDto) {
     const result = this.albumsService.update({ key: 'albums', id, dto });
@@ -127,12 +122,10 @@ export class AlbumsController {
     description: 'The album has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. albumId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Album not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Delete(':id')
   @HttpCode(204)
   delete(@Param() { id }: AlbumDtoId) {

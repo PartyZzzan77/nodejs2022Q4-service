@@ -21,9 +21,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Artist } from './Entities/atrtist.entities';
+import {
+  BadRequestUUID,
+  NotFound,
+  RequiredFields,
+} from '../users/Entities/user.entitie';
 
 @Controller('artist')
 @ApiTags('Arrtist')
@@ -38,9 +42,6 @@ export class ArtistsController {
     status: 200,
     type: [Artist],
     description: 'Successful operation',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
   })
   @Get()
   find() {
@@ -58,10 +59,8 @@ export class ArtistsController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
   })
   @Post()
   create(@Body() dto: AddArtistDto) {
@@ -78,12 +77,10 @@ export class ArtistsController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Artist not found.' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found.' })
   @Get(':id')
   findOne(@Param() { id }: ArtistDtoId) {
     const artist = this.artistsService.findOne({ key: 'artists', id });
@@ -103,12 +100,10 @@ export class ArtistsController {
     description: 'The artist has been updated.',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Put(':id')
   update(@Param() { id }: ArtistDtoId, @Body() dto: UpdateArtistDto) {
     const result = this.artistsService.update({ key: 'artists', id, dto });
@@ -127,12 +122,10 @@ export class ArtistsController {
     description: 'The artist has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiUnauthorizedResponse({
-    description: 'Access token is missing or invalid',
-  })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Delete(':id')
   @HttpCode(204)
   delete(@Param() { id }: ArtistDtoId) {

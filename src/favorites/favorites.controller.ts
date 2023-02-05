@@ -24,6 +24,11 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import {
+  BadRequestUUID,
+  NotFound,
+  Unprocessable,
+} from '../users/Entities/user.entitie';
 
 @Controller('favs')
 @ApiTags('Favorites')
@@ -56,9 +61,11 @@ export class FavoritesController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. trackId is invalid (not uuid)',
   })
   @ApiUnprocessableEntityResponse({
+    type: Unprocessable,
     description: 'Track not found',
   })
   @Post('track/:id')
@@ -81,9 +88,10 @@ export class FavoritesController {
     description: 'The track has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. trackId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Track not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
   @Delete('track/:id')
   @HttpCode(204)
   deleteTrack(@Param() { id }: TrackDtoId) {
@@ -104,9 +112,11 @@ export class FavoritesController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. albumId is invalid (not uuid)',
   })
   @ApiUnprocessableEntityResponse({
+    type: Unprocessable,
     description: 'Album not found',
   })
   @Post('album/:id')
@@ -129,9 +139,10 @@ export class FavoritesController {
     description: 'The album has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. albumId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Album not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Delete('album/:id')
   @HttpCode(204)
   deleteAlbum(@Param() { id }: AlbumDtoId) {
@@ -152,9 +163,11 @@ export class FavoritesController {
     description: 'Successful operation',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. artistId is invalid (not uuid)',
   })
   @ApiUnprocessableEntityResponse({
+    type: Unprocessable,
     description: 'Artist not found',
   })
   @Post('artist/:id')
@@ -177,9 +190,10 @@ export class FavoritesController {
     description: 'The artist has been deleted',
   })
   @ApiBadRequestResponse({
+    type: BadRequestUUID,
     description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Delete('artist/:id')
   @HttpCode(204)
   deleteArtist(@Param() { id }: ArtistDtoId) {
