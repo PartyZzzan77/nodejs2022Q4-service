@@ -1,6 +1,13 @@
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { hash } from 'bcrypt';
+import * as process from 'process';
+
+export const SALT = +process.env.CRYPT_SALT;
+export const getTimestampInSeconds = () => Math.floor(Date.now() / 1000);
+export const hasPassword = async (password: string) =>
+  await hash(password, SALT);
 
 @Entity({ name: 'users' })
 export class User {
@@ -24,15 +31,27 @@ export class User {
   version: number;
 
   @ApiProperty({ example: 1675540182719 })
-  @Column()
+  @Column({ default: getTimestampInSeconds() })
   createdAt: number;
 
   @ApiProperty({ example: 1675540182719 })
-  @Column()
+  @Column({ default: getTimestampInSeconds() })
   updatedAt: number;
 
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await hasPassword(this.password);
+  }
+
+  @BeforeInsert()
+  setStamp() {
+    this.createdAt = getTimestampInSeconds();
+    this.updatedAt = getTimestampInSeconds();
+  }
+
+  @BeforeInsert()
+  setVersion() {
+    this.version = 1;
   }
 }
 

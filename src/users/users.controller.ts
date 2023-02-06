@@ -55,8 +55,8 @@ export class UsersController {
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  findOne(@Param() { id }: UserIdDto) {
-    const user = this.usersService.findOne({ key: 'users', id });
+  async findOne(@Param() { id }: UserIdDto): Promise<User> {
+    const user = await this.usersService.findOne(id);
     if (!user) {
       throw new NotFoundException(Constants.USER_ERROR);
     }
@@ -75,8 +75,8 @@ export class UsersController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  create(@Body() dto: AddUserDto): Partial<User> {
-    return this.usersService.create({ key: 'users', dto });
+  async create(@Body() dto: AddUserDto): Promise<User> {
+    return await this.usersService.create(dto);
   }
 
   @ApiOperation({ summary: `Updates a user\'s password by ID` })
@@ -94,13 +94,18 @@ export class UsersController {
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
-  update(@Param() { id }: UserIdDto, @Body() dto: UpdateUserDto) {
-    const result = this.usersService.update({ key: 'users', id, dto });
+  async update(
+    @Param() { id }: UserIdDto,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User | string> {
+    const result = await this.usersService.update({ id, dto });
+
     if (result === Constants.USER_ERROR) {
       throw new NotFoundException(Constants.USER_ERROR);
     } else if (result === Constants.USER_INVALID) {
       throw new ForbiddenException(Constants.USER_INVALID);
     }
+
     return result;
   }
 
@@ -118,8 +123,9 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   @HttpCode(204)
-  delete(@Param() { id }: UserIdDto) {
-    const result = this.usersService.delete({ key: 'users', id });
+  async delete(@Param() { id }: UserIdDto): Promise<void> {
+    const result = await this.usersService.delete(id);
+
     if (!result) {
       throw new NotFoundException(Constants.USER_ERROR);
     }

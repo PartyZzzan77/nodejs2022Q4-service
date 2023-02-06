@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './Entities/user.entitie';
-import { Entity, FindOneParams } from '../repository/types';
+import {
+  getTimestampInSeconds,
+  hasPassword,
+  User,
+} from './Entities/user.entitie';
 import { RepositoryService } from '../repository/repository.service';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Constants } from '../constants';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { compareSync } from 'bcrypt';
 
+export type UpdateParams = {
+  id: string;
+  dto: UpdateUserDto;
+};
 @Injectable()
 export class UsersService {
   constructor(
@@ -16,24 +26,42 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  public findOne({ key, id }: FindOneParams): Entity | null {
-    const user = this.repository.findOne({ key, id });
+  public async findOne(id: string): Promise<User> {
+    return await this.usersRepository.findOneBy({ id });
+  }
+  public async create(dto) {
+    const userEntity = new User();
+    Object.assign(userEntity, dto);
+    return await this.usersRepository.save(userEntity);
+  }
+  public async update({ id, dto }: UpdateParams): Promise<User | string> {
+    const user = await this.findOne(id);
+    if (!user) {
+      return Constants.USER_ERROR;
+    }
+
+    const isValidPassword = compareSync(dto.oldPassword, user.password);
+
+    if (!isValidPassword) {
+      return Constants.USER_INVALID;
+    }
+
+    const updatedUser = { ...user };
+    updatedUser.updatedAt = getTimestampInSeconds();
+    updatedUser.password = await hasPassword(dto.newPassword);
+    updatedUser.version += 1;
+
+    await this.usersRepository.update(id, updatedUser);
+    return await this.findOne(id);
+  }
+
+  public async delete(id: string): Promise<DeleteResult> {
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) {
       return null;
     }
 
-    return new User(user);
-  }
-  public create({ key, dto }): Partial<User> {
-    const user = this.repository.create({ key, dto });
-    return new User(user);
-  }
-  public delete({ key, id }) {
-    return this.repository.delete({ key, id });
-  }
-  public update({ key, id, dto }) {
-    const user = this.repository.update({ key, id, dto });
-    return typeof user === 'string' ? user : new User(user);
+    return await this.usersRepository.delete({ id });
   }
 }

@@ -56,7 +56,7 @@ export class RepositoryService {
     return entity;
   }
   public find(storage: Storage) {
-    return this[storage].map((e) => (e instanceof User ? new User(e) : e));
+    return this[storage].map((e) => e);
   }
   public findOne({ key, id }: FindOneParams): Entity | null {
     const entity = this[key].find((e) => e.id === id);
