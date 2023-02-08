@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsUUID } from 'class-validator';
+import { Track } from '../../tracks/Entities/track.entitie';
 
 @Entity({ name: 'artists' })
 export class Artist {
@@ -16,4 +17,7 @@ export class Artist {
   @ApiProperty({ example: true })
   @Column()
   grammy: boolean;
+
+  @OneToMany(() => Track, (track) => track.album)
+  tracks: Track[];
 }

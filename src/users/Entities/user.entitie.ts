@@ -29,7 +29,7 @@ export class User {
   password: string;
 
   @ApiProperty({ example: '1' })
-  @Column()
+  @Column({ default: 1 })
   version: number;
 
   @ApiProperty({ example: 1675540182719 })
@@ -42,7 +42,6 @@ export class User {
 
   @BeforeInsert()
   async hashPassword() {
-    this.version = 1;
     this.password = await hasPassword(this.password);
   }
 }
