@@ -11,6 +11,10 @@ import {
   HttpCode,
   Put,
   ForbiddenException,
+  BadRequestException,
+  UsePipes,
+  ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   BadRequestUUID,
@@ -33,6 +37,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { isUUID } from 'class-validator';
 
 @Controller('user')
 @ApiTags('User')
@@ -55,8 +60,13 @@ export class UsersController {
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async findOne(@Param() { id }: UserIdDto): Promise<User> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
+    if (!isUUID(id, 4)) {
+      throw new BadRequestException(Constants.ID_ERROR);
+    }
+
     const user = await this.usersService.findOne(id);
+
     if (!user) {
       throw new NotFoundException(Constants.USER_ERROR);
     }
@@ -94,6 +104,7 @@ export class UsersController {
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
+  @UsePipes(new ValidationPipe())
   async update(
     @Param() { id }: UserIdDto,
     @Body() dto: UpdateUserDto,
@@ -122,6 +133,7 @@ export class UsersController {
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
   async delete(@Param() { id }: UserIdDto): Promise<void> {
     const result = await this.usersService.delete(id);

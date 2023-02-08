@@ -1,5 +1,6 @@
 export const enum Constants {
   USER_ERROR = 'User not found',
+  ID_ERROR = 'invalid id not uuid',
   ENTITY_ERROR = 'Entity not found',
   USER_INVALID = 'User invalid',
 

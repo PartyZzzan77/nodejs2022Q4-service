@@ -1,12 +1,12 @@
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tracks' })
 export class Track {
   @ApiProperty({ example: 'd9683e62-ce01-4ac4-80c7-23828cd13792' })
-  @PrimaryGeneratedColumn()
-  //@IsUUID()
+  @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   @IsString({ each: true })
   id: string;
 

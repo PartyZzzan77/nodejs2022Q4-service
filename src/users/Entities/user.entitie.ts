@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { hash } from 'bcrypt';
 import * as process from 'process';
+import { IsUUID } from 'class-validator';
 
 export const SALT = +process.env.CRYPT_SALT;
 export const getTimestampInSeconds = () => Math.floor(Date.now() / 1000);
@@ -15,11 +16,12 @@ export class User {
     example: 'd9683e62-ce01-4ac4-80c7-23828cd13792',
     description: 'unique identifier',
   })
-  @PrimaryGeneratedColumn()
+  @IsUUID()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
   @ApiProperty({ example: 'User' })
+  @Column()
   login: string;
 
   @Column()
@@ -40,18 +42,8 @@ export class User {
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await hasPassword(this.password);
-  }
-
-  @BeforeInsert()
-  setStamp() {
-    this.createdAt = getTimestampInSeconds();
-    this.updatedAt = getTimestampInSeconds();
-  }
-
-  @BeforeInsert()
-  setVersion() {
     this.version = 1;
+    this.password = await hasPassword(this.password);
   }
 }
 

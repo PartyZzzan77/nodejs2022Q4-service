@@ -9,7 +9,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Constants } from '../constants';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { compareSync } from 'bcrypt';
+import { compare } from 'bcrypt';
 
 export type UpdateParams = {
   id: string;
@@ -40,18 +40,20 @@ export class UsersService {
       return Constants.USER_ERROR;
     }
 
-    const isValidPassword = compareSync(dto.oldPassword, user.password);
+    const isValidPassword = await compare(dto.oldPassword, user.password);
 
     if (!isValidPassword) {
       return Constants.USER_INVALID;
     }
 
-    const updatedUser = { ...user };
-    updatedUser.updatedAt = getTimestampInSeconds();
-    updatedUser.password = await hasPassword(dto.newPassword);
-    updatedUser.version += 1;
+    const newPassword = await hasPassword(dto.newPassword);
 
-    await this.usersRepository.update(id, updatedUser);
+    await this.usersRepository.update(id, {
+      password: newPassword,
+      version: user.version + 1,
+      updatedAt: getTimestampInSeconds(),
+    });
+
     return await this.findOne(id);
   }
 
