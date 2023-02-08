@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,8 +7,11 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { AddArtistDto } from './dto/add-artist.dto';
@@ -28,6 +32,8 @@ import {
   NotFound,
   RequiredFields,
 } from '../users/Entities/user.entitie';
+import { isUUID } from 'class-validator';
+import { DeleteResult } from 'typeorm';
 
 @Controller('artist')
 @ApiTags('Artist')
@@ -49,25 +55,6 @@ export class ArtistsController {
   }
 
   @ApiOperation({
-    summary: `Add new artist`,
-    description: 'Add new artist',
-  })
-  @ApiBody({ type: AddArtistDto })
-  @ApiResponse({
-    status: 201,
-    type: Artist,
-    description: 'Successful operation',
-  })
-  @ApiBadRequestResponse({
-    type: RequiredFields,
-    description: 'Bad request. body does not contain required fields',
-  })
-  @Post()
-  create(@Body() dto: AddArtistDto) {
-    return this.artistsService.create({ key: 'artists', dto });
-  }
-
-  @ApiOperation({
     summary: 'Get single artist',
     description: 'Get single artist by id',
   })
@@ -82,11 +69,37 @@ export class ArtistsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found.' })
   @Get(':id')
-  findOne(@Param() { id }: ArtistDtoId) {
-    const artist = this.artistsService.findOne({ key: 'artists', id });
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Artist> {
+    if (!isUUID(id, 4)) {
+      throw new BadRequestException(Constants.ID_ERROR);
+    }
+
+    const artist = await this.artistsService.findOne(id);
+
     if (!artist) {
       throw new NotFoundException(Constants.ARTIST_ERROR);
     }
+
+    return artist;
+  }
+
+  @ApiOperation({
+    summary: `Add new artist`,
+    description: 'Add new artist',
+  })
+  @ApiBody({ type: AddArtistDto })
+  @ApiResponse({
+    status: 201,
+    type: Artist,
+    description: 'Successful operation',
+  })
+  @ApiBadRequestResponse({
+    type: RequiredFields,
+    description: 'Bad request. body does not contain required fields',
+  })
+  @Post()
+  async create(@Body() dto: AddArtistDto): Promise<Artist> {
+    return this.artistsService.create(dto);
   }
 
   @ApiOperation({
@@ -105,11 +118,17 @@ export class ArtistsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Put(':id')
-  update(@Param() { id }: ArtistDtoId, @Body() dto: UpdateArtistDto) {
-    const result = this.artistsService.update({ key: 'artists', id, dto });
-    if (result === Constants.ENTITY_ERROR) {
-      throw new NotFoundException(Constants.ENTITY_ERROR);
+  @UsePipes(new ValidationPipe())
+  async update(
+    @Param() { id }: ArtistDtoId,
+    @Body() dto: UpdateArtistDto,
+  ): Promise<Artist> {
+    const result = await this.artistsService.update({ id, dto });
+
+    if (!result) {
+      throw new NotFoundException(Constants.ARTIST_ERROR);
     }
+
     return result;
   }
 
@@ -127,11 +146,15 @@ export class ArtistsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Delete(':id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  delete(@Param() { id }: ArtistDtoId) {
-    const result = this.artistsService.delete({ key: 'artists', id });
-    if (!result) {
+  async delete(@Param() { id }: ArtistDtoId): Promise<DeleteResult> {
+    const track = await this.artistsService.delete(id);
+
+    if (!track.affected) {
       throw new NotFoundException(Constants.ARTIST_ERROR);
     }
+
+    return track;
   }
 }

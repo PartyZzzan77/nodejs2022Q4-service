@@ -1,39 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateParams, Entity, FindOneParams } from '../repository/types';
-import { RepositoryService } from '../repository/repository.service';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './Entities/album.entities';
+import { AddAlbumDto } from './dto/add-album.dto';
+import { UpdateAlbumParams } from './types/update.album.params.interface';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>,
-    public repository: RepositoryService,
   ) {}
   public async find(): Promise<Album[]> {
     return await this.albumsRepository.find();
   }
-  public findOne({ key, id }: FindOneParams): Entity | null {
-    const album = this.repository.findOne({ key, id });
+  public async findOne(id: string): Promise<Album> {
+    return this.albumsRepository.findOneBy({ id });
+  }
+  public async create(dto: AddAlbumDto): Promise<Album> {
+    const albumEntity = new Album();
+    Object.assign(albumEntity, dto);
+    return await this.albumsRepository.save(albumEntity);
+  }
+  public async delete(id: string) {
+    return await this.albumsRepository.delete({ id });
+  }
+  public async update({ id, dto }: UpdateAlbumParams): Promise<Album> {
+    const album = await this.findOne(id);
 
     if (!album) {
       return null;
     }
 
+    Object.assign(album, dto);
+    await this.albumsRepository.update(id, album);
+
     return album;
-  }
-  public create({ key, dto }: CreateParams) {
-    return this.repository.create({ key, dto });
-  }
-  public delete({ key, id }) {
-    const albumId = this.repository.delete({ key, id });
-    this.repository.cleanUpTrackAlbumId(albumId);
-    this.repository.cleanUpFavorites({ key, id: albumId });
-    return albumId;
-  }
-  public update({ key, id, dto }) {
-    return this.repository.update({ key, id, dto });
   }
 }

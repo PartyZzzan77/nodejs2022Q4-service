@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,8 +7,11 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { AlbumDtoId } from './dto/album-id.dto';
@@ -28,6 +32,8 @@ import {
   NotFound,
   RequiredFields,
 } from '../users/Entities/user.entitie';
+import { isUUID } from 'class-validator';
+import { DeleteResult } from 'typeorm';
 
 @Controller('album')
 @ApiTags('Album')
@@ -49,25 +55,6 @@ export class AlbumsController {
   }
 
   @ApiOperation({
-    summary: `Add new album`,
-    description: 'Add new album information',
-  })
-  @ApiBody({ type: AddAlbumDto })
-  @ApiResponse({
-    status: 201,
-    type: Album,
-    description: 'Album is created',
-  })
-  @ApiBadRequestResponse({
-    type: RequiredFields,
-    description: 'Bad request. body does not contain required fields',
-  })
-  @Post()
-  create(@Body() dto: AddAlbumDto) {
-    return this.albumsService.create({ key: 'albums', dto });
-  }
-
-  @ApiOperation({
     summary: 'Get single album by id',
     description: 'Get single album by id',
   })
@@ -82,11 +69,37 @@ export class AlbumsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Album not found.' })
   @Get(':id')
-  findOne(@Param() { id }: AlbumDtoId) {
-    const album = this.albumsService.findOne({ key: 'albums', id });
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Album> {
+    if (!isUUID(id, 4)) {
+      throw new BadRequestException(Constants.ID_ERROR);
+    }
+
+    const album = await this.albumsService.findOne(id);
+
     if (!album) {
       throw new NotFoundException(Constants.ALBUM_ERROR);
     }
+
+    return album;
+  }
+
+  @ApiOperation({
+    summary: `Add new album`,
+    description: 'Add new album information',
+  })
+  @ApiBody({ type: AddAlbumDto })
+  @ApiResponse({
+    status: 201,
+    type: Album,
+    description: 'Album is created',
+  })
+  @ApiBadRequestResponse({
+    type: RequiredFields,
+    description: 'Bad request. body does not contain required fields',
+  })
+  @Post()
+  async create(@Body() dto: AddAlbumDto) {
+    return this.albumsService.create(dto);
   }
 
   @ApiOperation({
@@ -105,9 +118,14 @@ export class AlbumsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Put(':id')
-  update(@Param() { id }: AlbumDtoId, @Body() dto: UpdateAlbumDto) {
-    const result = this.albumsService.update({ key: 'albums', id, dto });
-    if (result === Constants.ENTITY_ERROR) {
+  @UsePipes(new ValidationPipe())
+  async update(
+    @Param() { id }: AlbumDtoId,
+    @Body() dto: UpdateAlbumDto,
+  ): Promise<Album> {
+    const result = await this.albumsService.update({ id, dto });
+
+    if (!result) {
       throw new NotFoundException(Constants.ENTITY_ERROR);
     }
     return result;
@@ -127,12 +145,14 @@ export class AlbumsController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Delete(':id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  delete(@Param() { id }: AlbumDtoId) {
-    const result = this.albumsService.delete({ key: 'albums', id });
-    if (!result) {
-      throw new NotFoundException(Constants.TRACK_ERROR);
+  async delete(@Param() { id }: AlbumDtoId): Promise<DeleteResult> {
+    const album = await this.albumsService.delete(id);
+
+    if (!album.affected) {
+      throw new NotFoundException(Constants.ALBUM_ERROR);
     }
-    return result;
+    return album;
   }
 }

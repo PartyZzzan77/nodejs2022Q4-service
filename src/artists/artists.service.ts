@@ -1,39 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateParams, Entity, FindOneParams } from '../repository/types';
-import { RepositoryService } from '../repository/repository.service';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Artist } from './Entities/atrtist.entities';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AddArtistDto } from './dto/add-artist.dto';
+import { UpdateArtistParams } from './types/update.artist.params.interface';
 
 @Injectable()
 export class ArtistsService {
   constructor(
     @InjectRepository(Artist)
     private readonly artistsRepository: Repository<Artist>,
-    public repository: RepositoryService,
   ) {}
   public async find(): Promise<Artist[]> {
     return await this.artistsRepository.find();
   }
-  public findOne({ key, id }: FindOneParams): Entity | null {
-    const album = this.repository.findOne({ key, id });
+  public async findOne(id: string): Promise<Artist> {
+    return this.artistsRepository.findOneBy({ id });
+  }
+  public async create(dto: AddArtistDto): Promise<Artist> {
+    const artistEntity = new Artist();
+    Object.assign(artistEntity, dto);
+    return await this.artistsRepository.save(artistEntity);
+  }
+  public async delete(id: string): Promise<DeleteResult> {
+    return await this.artistsRepository.delete({ id });
+  }
+  public async update({ id, dto }: UpdateArtistParams): Promise<Artist> {
+    const artist = await this.findOne(id);
 
-    if (!album) {
+    if (!artist) {
       return null;
     }
 
-    return album;
-  }
-  public create({ key, dto }: CreateParams) {
-    return this.repository.create({ key, dto });
-  }
-  public delete({ key, id }) {
-    const artistId = this.repository.delete({ key, id });
-    this.repository.cleanUpTrackArtistId(artistId);
-    this.repository.cleanUpFavorites({ key, id: artistId });
-    return artistId;
-  }
-  public update({ key, id, dto }) {
-    return this.repository.update({ key, id, dto });
+    Object.assign(artist, dto);
+    await this.artistsRepository.update(id, artist);
+
+    return artist;
   }
 }
