@@ -5,6 +5,7 @@ import { Album } from './albums/Entities/album.entities';
 import { Artist } from './artists/Entities/atrtist.entities';
 import * as process from 'process';
 import 'dotenv/config';
+import { Favorite } from './favorites/Entities/favorite.entities';
 
 export const username = process.env.POSTGRES_USER;
 export const password = process.env.POSTGRES_PASSWORD;
@@ -15,7 +16,7 @@ export const ormConfig: DataSourceOptions = {
   username,
   password,
   database,
-  entities: [User, Track, Album, Artist],
+  entities: [User, Track, Album, Artist, Favorite],
   migrations: ['dist/migrations/*.js'],
   synchronize: true,
 };

@@ -8,6 +8,8 @@ import {
   Post,
   Res,
   UnprocessableEntityException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { Favorite, ResponseFav } from './Entities/favorite.entities';
@@ -47,8 +49,8 @@ export class FavoritesController {
     description: 'Access token is missing or invalid',
   })
   @Get()
-  find(): Favorite {
-    return this.favoritesService.find();
+  async find() {
+    return await this.favoritesService.find();
   }
 
   @ApiOperation({
@@ -69,8 +71,9 @@ export class FavoritesController {
     description: 'Track not found',
   })
   @Post('track/:id')
-  addTrack(@Param() { id }: TrackDtoId, @Res() res) {
-    const track = this.favoritesService.create({ key: 'tracks', id });
+  @UsePipes(new ValidationPipe())
+  async addTrack(@Param() { id }: TrackDtoId, @Res() res) {
+    const track = await this.favoritesService.create({ key: 'tracks', id });
 
     if (!track) {
       throw new UnprocessableEntityException(Constants.TRACK_INVALID);
@@ -93,9 +96,10 @@ export class FavoritesController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
   @Delete('track/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  deleteTrack(@Param() { id }: TrackDtoId) {
-    const track = this.favoritesService.delete({ key: 'tracks', id });
+  async deleteTrack(@Param() { id }: TrackDtoId) {
+    const track = await this.favoritesService.delete({ key: 'tracks', id });
 
     if (!track) {
       throw new NotFoundException(Constants.TRACK_ERROR);
@@ -120,8 +124,9 @@ export class FavoritesController {
     description: 'Album not found',
   })
   @Post('album/:id')
-  addAlbum(@Param() { id }: AlbumDtoId, @Res() res) {
-    const album = this.favoritesService.create({ key: 'albums', id });
+  @UsePipes(new ValidationPipe())
+  async addAlbum(@Param() { id }: AlbumDtoId, @Res() res) {
+    const album = await this.favoritesService.create({ key: 'albums', id });
 
     if (!album) {
       throw new UnprocessableEntityException(Constants.ALBUM_INVALID);
@@ -144,9 +149,10 @@ export class FavoritesController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
   @Delete('album/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  deleteAlbum(@Param() { id }: AlbumDtoId) {
-    const album = this.favoritesService.delete({ key: 'albums', id });
+  async deleteAlbum(@Param() { id }: AlbumDtoId) {
+    const album = await this.favoritesService.delete({ key: 'albums', id });
 
     if (!album) {
       throw new NotFoundException(Constants.ALBUM_ERROR);
@@ -171,8 +177,9 @@ export class FavoritesController {
     description: 'Artist not found',
   })
   @Post('artist/:id')
-  addArtist(@Param() { id }: ArtistDtoId, @Res() res) {
-    const artist = this.favoritesService.create({ key: 'artists', id });
+  @UsePipes(new ValidationPipe())
+  async addArtist(@Param() { id }: ArtistDtoId, @Res() res) {
+    const artist = await this.favoritesService.create({ key: 'artists', id });
 
     if (!artist) {
       throw new UnprocessableEntityException(Constants.ARTIST_INVALID);
@@ -195,9 +202,10 @@ export class FavoritesController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
   @Delete('artist/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  deleteArtist(@Param() { id }: ArtistDtoId) {
-    const artist = this.favoritesService.delete({ key: 'artists', id });
+  async deleteArtist(@Param() { id }: ArtistDtoId) {
+    const artist = await this.favoritesService.delete({ key: 'artists', id });
 
     if (!artist) {
       throw new NotFoundException(Constants.ARTIST_ERROR);

@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './Entities/album.entities';
 import { AddAlbumDto } from './dto/add-album.dto';
 import { UpdateAlbumParams } from './types/update.album.params.interface';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>,
+    private readonly favoritesService: FavoritesService,
   ) {}
   public async find(): Promise<Album[]> {
     return await this.albumsRepository.find();
@@ -23,6 +25,7 @@ export class AlbumsService {
     return await this.albumsRepository.save(albumEntity);
   }
   public async delete(id: string) {
+    await this.favoritesService.delete({ key: 'albums', id });
     return await this.albumsRepository.delete({ id });
   }
   public async update({ id, dto }: UpdateAlbumParams): Promise<Album> {

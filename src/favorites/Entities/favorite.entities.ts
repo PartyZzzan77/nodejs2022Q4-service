@@ -3,8 +3,13 @@ import { Album } from '../../albums/Entities/album.entities';
 import { Track } from '../../tracks/Entities/track.entitie';
 import { ApiProperty } from '@nestjs/swagger';
 import { Constants } from '../../constants';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+@Entity({ name: 'favorites' })
 export class Favorite {
+  @PrimaryColumn('numeric', { default: 1 })
+  id?: number;
+
   @ApiProperty({
     default: [
       {
@@ -14,6 +19,7 @@ export class Favorite {
       },
     ],
   })
+  @Column('text', { array: true, default: [] })
   artists: Artist[];
 
   @ApiProperty({
@@ -26,6 +32,7 @@ export class Favorite {
       },
     ],
   })
+  @Column('text', { array: true, default: [] })
   albums: Album[];
 
   @ApiProperty({
@@ -39,6 +46,7 @@ export class Favorite {
       },
     ],
   })
+  @Column('text', { array: true, default: [] })
   tracks: Track[];
 }
 
