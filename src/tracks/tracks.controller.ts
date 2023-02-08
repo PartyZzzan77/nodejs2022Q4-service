@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,8 +7,11 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { TrackDtoId } from './dto/track-id.dto';
@@ -28,6 +32,8 @@ import {
   NotFound,
   RequiredFields,
 } from '../users/Entities/user.entitie';
+import { isUUID } from 'class-validator';
+import { DeleteResult } from 'typeorm';
 
 @Controller('track')
 @ApiTags('Track')
@@ -43,24 +49,6 @@ export class TracksController {
   @Get()
   async find(): Promise<Track[]> {
     return await this.trackService.find();
-  }
-  @ApiOperation({
-    summary: `Add new track`,
-    description: 'Add new track information',
-  })
-  @ApiBody({ type: AddTrackDto })
-  @ApiResponse({
-    status: 201,
-    type: Track,
-    description: 'Successful operation',
-  })
-  @ApiBadRequestResponse({
-    type: RequiredFields,
-    description: 'Bad request. body does not contain required fields',
-  })
-  @Post()
-  create(@Body() dto: AddTrackDto) {
-    return this.trackService.create({ key: 'tracks', dto });
   }
 
   @ApiOperation({
@@ -78,14 +66,37 @@ export class TracksController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found.' })
   @Get(':id')
-  findOne(@Param() { id }: TrackDtoId) {
-    const track = this.trackService.findOne({ key: 'tracks', id });
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
+    if (!isUUID(id, 4)) {
+      throw new BadRequestException(Constants.ID_ERROR);
+    }
+
+    const track = await this.trackService.findOne(id);
 
     if (!track) {
       throw new NotFoundException(Constants.TRACK_ERROR);
     }
 
     return track;
+  }
+
+  @ApiOperation({
+    summary: `Add new track`,
+    description: 'Add new track information',
+  })
+  @ApiBody({ type: AddTrackDto })
+  @ApiResponse({
+    status: 201,
+    type: Track,
+    description: 'Successful operation',
+  })
+  @ApiBadRequestResponse({
+    type: RequiredFields,
+    description: 'Bad request. body does not contain required fields',
+  })
+  @Post()
+  async create(@Body() dto: AddTrackDto): Promise<Track> {
+    return await this.trackService.create(dto);
   }
 
   @ApiOperation({
@@ -104,11 +115,17 @@ export class TracksController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
   @Put(':id')
-  update(@Param() { id }: TrackDtoId, @Body() dto: UpdateTrackDto) {
-    const result = this.trackService.update({ key: 'tracks', id, dto });
-    if (result === Constants.ENTITY_ERROR) {
-      throw new NotFoundException(Constants.ENTITY_ERROR);
+  @UsePipes(new ValidationPipe())
+  async update(
+    @Param() { id }: TrackDtoId,
+    @Body() dto: UpdateTrackDto,
+  ): Promise<Track> {
+    const result = await this.trackService.update({ id, dto });
+
+    if (!result) {
+      throw new NotFoundException(Constants.TRACK_ERROR);
     }
+
     return result;
   }
 
@@ -126,11 +143,14 @@ export class TracksController {
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
   @Delete(':id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  delete(@Param() { id }: TrackDtoId) {
-    const result = this.trackService.delete({ key: 'tracks', id });
-    if (!result) {
+  async delete(@Param() { id }: TrackDtoId): Promise<DeleteResult> {
+    const track = await this.trackService.delete(id);
+
+    if (!track.affected) {
       throw new NotFoundException(Constants.TRACK_ERROR);
     }
+    return track;
   }
 }

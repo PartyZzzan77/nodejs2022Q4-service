@@ -1,38 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { Track } from './Entities/track.entitie';
-import { CreateParams, Entity, FindOneParams } from '../repository/types';
-import { RepositoryService } from '../repository/repository.service';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AddTrackDto } from './dto/add-track.dto';
 
 @Injectable()
 export class TracksService {
   constructor(
     @InjectRepository(Track)
     private readonly tracksRepository: Repository<Track>,
-    public repository: RepositoryService,
   ) {}
   public async find(): Promise<Track[]> {
     return await this.tracksRepository.find();
   }
-  public findOne({ key, id }: FindOneParams): Entity | null {
-    const track = this.repository.findOne({ key, id });
+  public async findOne(id: string): Promise<Track> {
+    return await this.tracksRepository.findOneBy({ id });
+  }
+  public async create(dto: AddTrackDto): Promise<Track> {
+    const trackEntity = new Track();
+    Object.assign(trackEntity, dto);
+    return await this.tracksRepository.save(trackEntity);
+  }
+  public async delete(id: string): Promise<DeleteResult> {
+    return await this.tracksRepository.delete({ id });
+  }
+  public async update({ id, dto }): Promise<Track> {
+    const track = await this.findOne(id);
 
     if (!track) {
       return null;
     }
 
+    Object.assign(track, dto);
+    await this.tracksRepository.update(id, track);
+
     return track;
-  }
-  public create({ key, dto }: CreateParams) {
-    return this.repository.create({ key, dto });
-  }
-  public delete({ key, id }) {
-    const trackId = this.repository.delete({ key, id });
-    this.repository.cleanUpFavorites({ key, id });
-    return trackId;
-  }
-  public update({ key, id, dto }) {
-    return this.repository.update({ key, id, dto });
   }
 }

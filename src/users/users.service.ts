@@ -4,7 +4,6 @@ import {
   hasPassword,
   User,
 } from './Entities/user.entitie';
-import { RepositoryService } from '../repository/repository.service';
 import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Constants } from '../constants';
@@ -18,7 +17,6 @@ export type UpdateParams = {
 @Injectable()
 export class UsersService {
   constructor(
-    public repository: RepositoryService,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
@@ -29,7 +27,7 @@ export class UsersService {
   public async findOne(id: string): Promise<User> {
     return await this.usersRepository.findOneBy({ id });
   }
-  public async create(dto) {
+  public async create(dto): Promise<User> {
     const userEntity = new User();
     Object.assign(userEntity, dto);
     return await this.usersRepository.save(userEntity);
