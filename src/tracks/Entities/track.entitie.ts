@@ -1,7 +1,6 @@
 import { IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Album } from '../../albums/Entities/album.entities';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tracks' })
 export class Track {
@@ -26,7 +25,4 @@ export class Track {
   @ApiProperty({ example: '10c8d54a-v5e4-5a71-90b6-3786a5cec073' })
   @Column({ nullable: true })
   albumId?: string;
-
-  @ManyToOne(() => Album, (album) => album.tracks, { onDelete: 'SET NULL' })
-  album: Album;
 }

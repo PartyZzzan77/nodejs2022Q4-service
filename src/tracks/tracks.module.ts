@@ -9,5 +9,6 @@ import { FavoritesModule } from '../favorites/favorites.module';
   imports: [TypeOrmModule.forFeature([Track]), FavoritesModule],
   controllers: [TracksController],
   providers: [TracksService],
+  exports: [TracksService],
 })
 export class TracksModule {}
