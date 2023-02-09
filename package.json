@@ -22,7 +22,8 @@
     "typeorm": "npm run build && npx typeorm -d ./dist/**/ormconfig.js",
     "db:create": "npm run typeorm -- migration:generate",
     "db:run": "npm run typeorm -- migration:run",
-    "db:revert": "npm run typeorm -- migration:revert"
+    "db:revert": "npm run typeorm -- migration:revert",
+    "scan:app": "docker run -it --rm anchore/grype app"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

@@ -8,6 +8,7 @@ services:
       - ./pgadmin:${PG_ADMIN_DATA}
     env_file:
       - .env
+    restart: always
     networks:
       - postgres
 
@@ -25,9 +26,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: always
     networks:
       - postgres
-    restart: always
 
   nest-api:
     container_name: app
@@ -41,9 +42,9 @@ services:
       - ${PORT}:${PORT}
       - ${DEBUG}:${DEBUG}
     command: npm run start:dev
-    restart: always
     depends_on:
       - postgres
+    restart: always
     networks:
       - postgres
 

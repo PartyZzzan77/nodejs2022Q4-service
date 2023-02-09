@@ -10,9 +10,10 @@ import { Favorite } from './favorites/Entities/favorite.entities';
 export const username = process.env.POSTGRES_USER;
 export const password = process.env.POSTGRES_PASSWORD;
 export const database = process.env.POSTGRES_DB;
+export const host = process.env.POSTGRES_HOST;
 export const ormConfig: DataSourceOptions = {
   type: 'postgres',
-  host: 'localhost',
+  host,
   username,
   password,
   database,
