@@ -7,7 +7,7 @@ services:
     volumes:
       - ./pgadmin:${PG_ADMIN_DATA}
     env_file:
-      - .env
+      - .env.example
     restart: always
     networks:
       - postgres
@@ -16,7 +16,7 @@ services:
     container_name: postgres
     image: postgres:15.1-alpine
     env_file:
-      - .env
+      - .env.example
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT_EXTERNAL}
     volumes:
@@ -37,7 +37,7 @@ services:
       context: .
     image: app:app
     env_file:
-      - .env
+      - .env.example
     ports:
       - ${PORT}:${PORT}
       - ${DEBUG}:${DEBUG}
