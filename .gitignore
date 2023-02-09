@@ -2,6 +2,10 @@
 /dist
 /node_modules
 .env.example
+
+/pgadmin
+/postgres-data
+/migrations
 # Logs
 logs
 *.log
