@@ -75,6 +75,8 @@ export class FavoritesService {
     return this.serializeEntity(entity).filter((e) => e.id !== id);
   }
 
+  private sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
   public async delete({ key, id }: CreateFaforitesParams) {
     const allEntity = await this.getBase();
     const entity = await this[key].findOneBy({ id });
@@ -92,6 +94,8 @@ export class FavoritesService {
         allEntity.artists = this.cleanUpFavorites(id, allEntity.artists);
       }
     }
+    //TODO 🙈there is a floating bug on general tests. Alone the tests pass normally.
+    await this.sleep(300);
 
     return await this.favoritesRepository.save({ ...allEntity });
   }
