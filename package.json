@@ -23,7 +23,7 @@
     "db:create": "npm run typeorm -- migration:generate",
     "db:run": "npm run typeorm -- migration:run",
     "db:revert": "npm run typeorm -- migration:revert",
-    "scan:app": "docker run -it --rm anchore/grype app"
+    "snyc": "docker scan node"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

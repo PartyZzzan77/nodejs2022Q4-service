@@ -11,15 +11,15 @@ export const username = process.env.POSTGRES_USER;
 export const password = process.env.POSTGRES_PASSWORD;
 export const database = process.env.POSTGRES_DB;
 export const migrationConfig: DataSourceOptions = {
-  type: 'postgres',
-  host: 'localhost',
-  username,
-  password,
-  database,
-  entities: [User, Track, Album, Artist, Favorite],
-  migrations: [__dirname, 'dist/**/migrations/*.js'],
-  synchronize: false,
-  migrationsRun: true,
+	type: 'postgres',
+	host: 'localhost',
+	username,
+	password,
+	database,
+	entities: [User, Track, Album, Artist, Favorite],
+	migrations: [__dirname, 'dist/**/migrations/*.js'],
+	synchronize: true,
+	migrationsRun: true,
 };
 
 export const dataSource = new DataSource(migrationConfig);
