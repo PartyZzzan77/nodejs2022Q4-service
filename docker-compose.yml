@@ -10,7 +10,7 @@ services:
       args:
         - PORT = ${PORT}
     env_file:
-      - .env.example
+      - .env
     ports:
       - ${PORT}:${PORT}
       - ${DEBUG}:${DEBUG}
@@ -30,7 +30,7 @@ services:
       dockerfile: src/Dockerfile
       context: .
     env_file:
-      - .env.example
+      - .env
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT_EXTERNAL}
     volumes:
@@ -51,7 +51,7 @@ services:
     volumes:
       - ./pgadmin:${PG_ADMIN_DATA}
     env_file:
-      - .env.example
+      - .env
     restart: always
     networks:
       - postgres

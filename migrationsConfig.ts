@@ -19,6 +19,7 @@ export const migrationConfig: DataSourceOptions = {
   entities: [User, Track, Album, Artist, Favorite],
   migrations: [__dirname, 'dist/**/migrations/*.js'],
   synchronize: false,
+  migrationsRun: true,
 };
 
 export const dataSource = new DataSource(migrationConfig);
