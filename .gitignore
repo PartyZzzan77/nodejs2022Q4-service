@@ -1,11 +1,11 @@
 # compiled output
 /dist
 /node_modules
-.env.example
+.env
 
 /pgadmin
 /postgres-data
-/migrations
+
 # Logs
 logs
 *.log
