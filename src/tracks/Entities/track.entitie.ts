@@ -13,11 +13,11 @@ export class Track {
   id: string;
 
   @ApiProperty({ example: 'Breathe' })
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @ApiProperty({ example: 214 })
-  @Column()
+  @Column({ nullable: true })
   duration: number;
 
   @ApiProperty({ example: '97c8d54a-b5e4-4a71-90b6-3786a5bbc094' })

@@ -11,11 +11,11 @@ export class Album {
   id: string;
 
   @ApiProperty({ example: 'Music for the Jilted Generation' })
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @ApiProperty({ example: 1994 })
-  @Column()
+  @Column({ nullable: true })
   year: number;
 
   @ApiProperty({ example: 'd2992f19-7cac-4a86-9b3d-9d143a42b66d' })

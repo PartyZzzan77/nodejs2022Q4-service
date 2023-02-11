@@ -11,11 +11,11 @@ export class Artist {
   id: string;
 
   @ApiProperty({ example: 'Prodigy' })
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @ApiProperty({ example: true })
-  @Column()
+  @Column({ nullable: true })
   grammy: boolean;
 
   @OneToMany(() => Track, (track: Track) => track.artistId, {

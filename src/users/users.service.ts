@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Constants } from '../constants';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { compare } from 'bcrypt';
+import { AddUserDto } from './dto/add-user.dto';
 
 export type UpdateParams = {
   id: string;
@@ -27,7 +28,7 @@ export class UsersService {
   public async findOne(id: string): Promise<User> {
     return await this.usersRepository.findOneBy({ id });
   }
-  public async create(dto): Promise<User> {
+  public async create(dto: AddUserDto): Promise<User> {
     const userEntity = new User();
     Object.assign(userEntity, dto);
     return await this.usersRepository.save(userEntity);
@@ -38,16 +39,19 @@ export class UsersService {
       return Constants.USER_ERROR;
     }
 
-    const isValidPassword = await compare(dto.oldPassword, user.password);
+    const isValidPassword = await compare(
+      dto.oldPassword.toString(),
+      user.password.toString(),
+    );
 
     if (!isValidPassword) {
       return Constants.USER_INVALID;
     }
 
-    const newPassword = await hasPassword(dto.newPassword);
+    const newPassword = await hasPassword(dto.newPassword.toString());
 
     await this.usersRepository.update(id, {
-      password: newPassword,
+      password: newPassword.toString(),
       version: user.version + 1,
       updatedAt: getTimestampInSeconds(),
     });

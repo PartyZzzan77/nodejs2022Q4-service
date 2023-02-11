@@ -21,7 +21,7 @@ export class User {
   id: string;
 
   @ApiProperty({ example: 'User' })
-  @Column()
+  @Column({ nullable: true })
   login: string;
 
   @Column()
@@ -42,7 +42,7 @@ export class User {
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await hasPassword(this.password);
+    this.password = await hasPassword(`${this.password}`);
   }
 }
 
