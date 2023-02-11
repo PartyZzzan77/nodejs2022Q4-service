@@ -40,25 +40,4 @@ export class TracksService {
 
     return track;
   }
-
-  public async cleanUpAlbum(id: string): Promise<void> {
-    const tracks = await this.find();
-    tracks.forEach((t) => {
-      if (t.albumId === id) {
-        t.albumId = null;
-      }
-    });
-
-    await this.tracksRepository.save(tracks);
-  }
-  public async cleanUpArtist(id: string): Promise<void> {
-    const artists = await this.find();
-    artists.forEach((t) => {
-      if (t.artistId === id) {
-        t.artistId = null;
-      }
-    });
-
-    await this.tracksRepository.save(artists);
-  }
 }

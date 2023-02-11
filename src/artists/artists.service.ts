@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AddArtistDto } from './dto/add-artist.dto';
 import { UpdateArtistParams } from './types/update.artist.params.interface';
 import { FavoritesService } from '../favorites/favorites.service';
-import { TracksService } from '../tracks/tracks.service';
 
 @Injectable()
 export class ArtistsService {
@@ -13,7 +12,6 @@ export class ArtistsService {
     @InjectRepository(Artist)
     private readonly artistsRepository: Repository<Artist>,
     private readonly favoritesService: FavoritesService,
-    private readonly trackService: TracksService,
   ) {}
   public async find(): Promise<Artist[]> {
     return await this.artistsRepository.find();
@@ -28,7 +26,6 @@ export class ArtistsService {
   }
   public async delete(id: string): Promise<DeleteResult> {
     await this.favoritesService.delete({ key: 'artists', id });
-    await this.trackService.cleanUpArtist(id);
 
     return await this.artistsRepository.delete({ id });
   }

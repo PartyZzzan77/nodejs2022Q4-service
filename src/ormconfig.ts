@@ -12,14 +12,14 @@ export const password = process.env.POSTGRES_PASSWORD;
 export const database = process.env.POSTGRES_DB;
 export const host = process.env.POSTGRES_HOST;
 export const ormConfig: DataSourceOptions = {
-	type: 'postgres',
-	host,
-	username,
-	password,
-	database,
-	entities: [User, Track, Album, Artist, Favorite],
-	migrations: [__dirname, 'dist/**/migrations/*.js'],
-	synchronize: true,
+  type: 'postgres',
+  host,
+  username,
+  password,
+  database,
+  entities: [User, Track, Album, Artist, Favorite],
+  migrations: [__dirname, 'dist/**/migrations/*.js'],
+  synchronize: true,
 };
 
 export const dataSource = new DataSource(ormConfig);

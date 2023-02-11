@@ -5,7 +5,6 @@ import { Album } from './Entities/album.entities';
 import { AddAlbumDto } from './dto/add-album.dto';
 import { UpdateAlbumParams } from './types/update.album.params.interface';
 import { FavoritesService } from '../favorites/favorites.service';
-import { TracksService } from '../tracks/tracks.service';
 
 @Injectable()
 export class AlbumsService {
@@ -13,7 +12,6 @@ export class AlbumsService {
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>,
     private readonly favoritesService: FavoritesService,
-    private readonly trackService: TracksService,
   ) {}
   public async find(): Promise<Album[]> {
     return await this.albumsRepository.find();
@@ -28,8 +26,6 @@ export class AlbumsService {
   }
   public async delete(id: string) {
     await this.favoritesService.delete({ key: 'albums', id });
-    await this.trackService.cleanUpAlbum(id);
-
     return await this.albumsRepository.delete({ id });
   }
   public async update({ id, dto }: UpdateAlbumParams): Promise<Album> {
