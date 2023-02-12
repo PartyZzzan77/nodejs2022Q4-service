@@ -31,6 +31,7 @@ export class FavoritesService {
 
     if (!favorites) {
       await this.favoritesRepository.save(new Favorite());
+      return this.find();
     }
 
     const { tracks, albums, artists } = favorites;
