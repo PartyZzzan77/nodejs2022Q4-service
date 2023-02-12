@@ -19,84 +19,80 @@ export class FavoritesService {
     @InjectRepository(Artist)
     private readonly artists: Repository<Artist>,
   ) {}
+
   public async find() {
-    const base = !(await this.getBase())
-      ? await this.initBase()
-      : await this.getBase();
+    const [favorites] = await this.favoritesRepository.find({
+      relations: {
+        tracks: true,
+        albums: true,
+        artists: true,
+      },
+    });
+    const { tracks, albums, artists } = favorites;
 
-    base.tracks = this.serializeEntity(base.tracks);
-    base.artists = this.serializeEntity(base.artists);
-    base.albums = this.serializeEntity(base.albums);
-
-    return base;
-  }
-  private serializeEntity(entity) {
-    return entity.map((e) => (typeof e === 'string' ? JSON.parse(e) : e));
-  }
-  private async initBase() {
-    return this.favoritesRepository.save({});
+    return { tracks, albums, artists };
   }
 
-  private async getBase(): Promise<Favorite> {
-    const base = await this.favoritesRepository.find({ where: { id: 1 } });
-    return { ...base }[0];
-  }
+  private getEntity = async ({ key, id }: CreateFaforitesParams) => {
+    const [favorites] = await this.favoritesRepository.find({
+      relations: {
+        tracks: true,
+        albums: true,
+        artists: true,
+      },
+    });
+
+    const entity = await this[key].findOneBy({ id });
+
+    return {
+      favorites,
+      entity,
+    };
+  };
 
   public async create({ key, id }: CreateFaforitesParams) {
-    const allEntity = await this.getBase();
-    const entity = await this[key].findOneBy({ id });
+    const { favorites, entity } = await this.getEntity({ key, id });
 
     if (!entity) {
       return null;
     }
 
-    if (entity.id === id) {
-      const isAlreadyExistFavorites = this.serializeEntity(allEntity[key]).find(
-        (e) => e.id === id,
-      );
-
-      if (isAlreadyExistFavorites) {
-        return null;
-      }
-
-      if (entity instanceof Track) {
-        allEntity.tracks.push(entity);
-      } else if (entity instanceof Album) {
-        allEntity.albums.push(entity);
-      } else if (entity instanceof Artist) {
-        allEntity.artists.push(entity);
-      }
+    if (entity instanceof Track) {
+      favorites.tracks.push(entity);
     }
 
-    return await this.favoritesRepository.save({ ...allEntity });
-  }
+    if (entity instanceof Album) {
+      favorites.albums.push(entity);
+    }
 
-  private cleanUpFavorites(id, entity = []) {
-    return this.serializeEntity(entity).filter((e) => e.id !== id);
-  }
+    if (entity instanceof Artist) {
+      favorites.artists.push(entity);
+    }
 
-  private sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    return await this.favoritesRepository.save(favorites);
+  }
 
   public async delete({ key, id }: CreateFaforitesParams) {
-    const allEntity = await this.getBase();
-    const entity = await this[key].findOneBy({ id });
+    const { favorites, entity } = await this.getEntity({ key, id });
 
     if (!entity) {
       return null;
     }
 
-    if (entity.id === id) {
-      if (entity instanceof Track) {
-        allEntity.tracks = this.cleanUpFavorites(id, allEntity.tracks);
-      } else if (entity instanceof Album) {
-        allEntity.albums = this.cleanUpFavorites(id, allEntity.albums);
-      } else if (entity instanceof Artist) {
-        allEntity.artists = this.cleanUpFavorites(id, allEntity.artists);
-      }
+    if (entity instanceof Track) {
+      favorites.tracks = favorites.tracks.filter((entity) => entity.id !== id);
     }
-    //TODO 🙈there is a floating bug on general tests. Alone the tests pass normally.
-    await this.sleep(300);
 
-    return await this.favoritesRepository.save({ ...allEntity });
+    if (entity instanceof Album) {
+      favorites.albums = favorites.albums.filter((entity) => entity.id !== id);
+    }
+
+    if (entity instanceof Artist) {
+      favorites.artists = favorites.artists.filter(
+        (entity) => entity.id !== id,
+      );
+    }
+
+    return this.favoritesRepository.save(favorites);
   }
 }

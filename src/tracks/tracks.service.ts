@@ -4,14 +4,12 @@ import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddTrackDto } from './dto/add-track.dto';
 import { UpdateTrackParams } from './types/update.track.params.interface';
-import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class TracksService {
   constructor(
     @InjectRepository(Track)
     private readonly tracksRepository: Repository<Track>,
-    private readonly favoritesService: FavoritesService,
   ) {}
   public async find(): Promise<Track[]> {
     return await this.tracksRepository.find();
@@ -25,7 +23,6 @@ export class TracksService {
     return await this.tracksRepository.save(trackEntity);
   }
   public async delete(id: string): Promise<DeleteResult> {
-    await this.favoritesService.delete({ key: 'tracks', id });
     return await this.tracksRepository.delete({ id });
   }
   public async update({ id, dto }: UpdateTrackParams): Promise<Track> {
