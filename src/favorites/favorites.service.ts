@@ -29,10 +29,6 @@ export class FavoritesService {
       },
     });
 
-    if (!favorites) {
-      await this.favoritesRepository.save(new Favorite());
-    }
-
     const { tracks, albums, artists } = favorites;
 
     return { tracks, albums, artists };
@@ -46,10 +42,6 @@ export class FavoritesService {
         artists: true,
       },
     });
-
-    if (!favorites) {
-      await this.favoritesRepository.save(new Favorite());
-    }
 
     const entity = await this[key].findOneBy({ id });
 

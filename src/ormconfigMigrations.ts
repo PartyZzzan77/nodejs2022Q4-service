@@ -19,6 +19,7 @@ export const ormConfigMigrations: DataSourceOptions = {
   database,
   entities: [User, Track, Album, Artist, Favorite],
   migrations: [__dirname, 'dist/**/migrations/*.js'],
+  synchronize: true,
   migrationsRun: true,
 };
 
