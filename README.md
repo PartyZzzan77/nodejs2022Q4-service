@@ -27,15 +27,12 @@ git checkout db
 rename the **evn.exapmle** file
 ```
 ```md
-docker-compose up --build
+npm run docker:build
 ```
 ### Testing
 
 ```md
-npm install
-```
-```md
-npm run test
+npm run docker:test
 ```
 ### ⚠️ To connect to the database via the graphical interface, use the following parameters
 
@@ -53,9 +50,15 @@ db:run
 db:revert
 
 Example of usage
+```md
+npm install
+```
+```md
+npm run build
+```
 
 ```md
-npm run db:create newMigration
+npm run db:create migrations/newMigration
 ```
 
 Then you can roll the migration with the command
@@ -66,5 +69,5 @@ npm run db:run
 To check for image vulnerabilities, use the command (will take some time)
 
 ```md
-npm run snyc
+npm run docker:scan
 ```
