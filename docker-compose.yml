@@ -34,7 +34,7 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT_EXTERNAL}
     volumes:
-      - ./postgres-data:${POSTGRES_DATA}
+      - DB:${POSTGRES_DATA}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -44,23 +44,9 @@ services:
     networks:
       - postgres
 
-  pgadmin:
-    image: dpage/pgadmin4:6.18
-    ports:
-      - ${PGADMIN_PORT}:${PGADMIN_EXTERNAL}
-    volumes:
-      - ./pgadmin:${PG_ADMIN_DATA}
-    env_file:
-      - .env
-    restart: always
-    networks:
-      - postgres
-
 volumes:
+  DB:
   ignore:
-  pgadmin:
-  postgres-data:
-
 
 networks:
   postgres:
