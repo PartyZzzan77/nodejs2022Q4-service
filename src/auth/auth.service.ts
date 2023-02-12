@@ -7,9 +7,13 @@ import { Repository } from 'typeorm';
 import { compare } from 'bcrypt';
 import * as process from 'process';
 import 'dotenv/config';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
+import { Tokens } from './types/tokens.interface';
+import { TokenResponse } from './types/token-response.interface';
 
 const SECRET = process.env.JWT_SECRET_KEY;
+const ACCESS_TOKEN_TIME = process.env.TOKEN_EXPIRE_TIME;
+const REFRESH_TOKEN_TIME = process.env.TOKEN_REFRESH_EXPIRE_TIME;
 @Injectable()
 export class AuthService {
   constructor(
@@ -41,15 +45,42 @@ export class AuthService {
     return user;
   }
 
-  public async generateJWT(user: User) {
+  public async generateJWT(user: User): Promise<Tokens> {
     const { id, login } = user;
-    const accessToken = sign({ id, login }, SECRET);
-    const refreshToken = '';
+    const accessToken = sign({ id, login }, SECRET, {
+      expiresIn: ACCESS_TOKEN_TIME,
+    });
+    const refreshToken = sign({ id, login }, SECRET, {
+      expiresIn: REFRESH_TOKEN_TIME,
+    });
 
     return { accessToken, refreshToken };
   }
 
-  public async refresh() {
-    return `refresh`;
+  private updateJWT({
+    id,
+    login,
+  }: Pick<TokenResponse, 'id' | 'login'>): Tokens {
+    const accessToken = sign({ id, login }, SECRET, {
+      expiresIn: ACCESS_TOKEN_TIME,
+    });
+    const refreshToken = sign({ id, login }, SECRET, {
+      expiresIn: REFRESH_TOKEN_TIME,
+    });
+    return { accessToken, refreshToken };
+  }
+
+  public async refresh(token: string) {
+    try {
+      const { id, login, exp } = verify(token, SECRET) as TokenResponse;
+
+      if (Date.now() >= exp * 1000) {
+        return null;
+      }
+
+      return this.updateJWT({ id, login });
+    } catch {
+      return null;
+    }
   }
 }
