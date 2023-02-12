@@ -28,6 +28,11 @@ export class FavoritesService {
         artists: true,
       },
     });
+
+    if (!favorites) {
+      await this.favoritesRepository.save(new Favorite());
+    }
+
     const { tracks, albums, artists } = favorites;
 
     return { tracks, albums, artists };
