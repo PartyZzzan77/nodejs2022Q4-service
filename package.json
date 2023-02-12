@@ -24,7 +24,9 @@
     "db:run": "npm run typeorm -- migration:run",
     "db:revert": "npm run typeorm -- migration:revert",
     "db:drop": "npm run typeorm schema:drop",
-    "snyc": "docker scan node"
+    "docker:build": "docker-compose up --build",
+    "docker:test": "docker exec app npm run test ",
+    "docker:scan": "docker scan node"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
