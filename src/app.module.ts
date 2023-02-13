@@ -15,6 +15,7 @@ import { TracksController } from './tracks/tracks.controller';
 import { AlbumsController } from './albums/albums.controller';
 import { ArtistsController } from './artists/artists.controller';
 import { FavoritesController } from './favorites/favorites.controller';
+import { AuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { FavoritesController } from './favorites/favorites.controller';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthGuard],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

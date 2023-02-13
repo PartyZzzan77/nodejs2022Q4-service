@@ -15,6 +15,7 @@ import {
   UsePipes,
   ValidationPipe,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   BadRequestUUID,
@@ -38,8 +39,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isUUID } from 'class-validator';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('user')
+//@UseGuards(AuthGuard)
 @ApiTags('User')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

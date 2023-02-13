@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -34,6 +35,7 @@ import {
 } from '../users/Entities/user.entitie';
 import { isUUID } from 'class-validator';
 import { DeleteResult } from 'typeorm';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('artist')
 @ApiTags('Artist')

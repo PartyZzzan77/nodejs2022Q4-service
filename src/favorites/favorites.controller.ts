@@ -8,6 +8,7 @@ import {
   Post,
   Res,
   UnprocessableEntityException,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -31,6 +32,7 @@ import {
   NotFound,
   Unprocessable,
 } from '../users/Entities/user.entitie';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('favs')
 @ApiTags('Favorites')

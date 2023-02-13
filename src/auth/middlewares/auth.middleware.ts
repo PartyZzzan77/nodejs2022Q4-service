@@ -12,7 +12,7 @@ export class AuthMiddleware implements NestMiddleware {
   public async use(req: ExpressRequest, res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
       req.user = null;
-      return;
+      return next();
     }
 
     const tokenHeader = req.headers.authorization.split(' ');
@@ -20,7 +20,7 @@ export class AuthMiddleware implements NestMiddleware {
 
     if (schemaType !== 'Bearer') {
       req.user = null;
-      return;
+      return next();
     }
     const token = tokenHeader[1];
     try {

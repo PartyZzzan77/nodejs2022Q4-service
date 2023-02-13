@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
