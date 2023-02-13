@@ -7,6 +7,8 @@ import {
   ForbiddenException,
   HttpCode,
   UnauthorizedException,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AddUserDto } from '../users/dto/add-user.dto';
@@ -19,6 +21,7 @@ import { TokenDto } from './dto/token.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('signup')
   @UsePipes(new ValidationPipe())
   async signup(@Body() createAuthDto: AddUserDto): Promise<User> {

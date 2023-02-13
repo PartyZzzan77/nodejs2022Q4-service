@@ -11,9 +11,9 @@ import { sign, verify } from 'jsonwebtoken';
 import { Tokens } from './types/tokens.interface';
 import { TokenResponse } from './types/token-response.interface';
 
-const SECRET = process.env.JWT_SECRET_KEY;
-const ACCESS_TOKEN_TIME = process.env.TOKEN_EXPIRE_TIME;
-const REFRESH_TOKEN_TIME = process.env.TOKEN_REFRESH_EXPIRE_TIME;
+export const SECRET = process.env.JWT_SECRET_KEY;
+export const ACCESS_TOKEN_TIME = process.env.TOKEN_EXPIRE_TIME;
+export const REFRESH_TOKEN_TIME = process.env.TOKEN_REFRESH_EXPIRE_TIME;
 @Injectable()
 export class AuthService {
   constructor(

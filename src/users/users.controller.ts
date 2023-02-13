@@ -1,4 +1,5 @@
 import {
+  Req,
   Controller,
   Get,
   Param,
@@ -38,6 +39,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isUUID } from 'class-validator';
+import { ExpressRequest } from '../types/express-request.interface';
 
 @Controller('user')
 @ApiTags('User')
@@ -47,7 +49,8 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [User] })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async find(): Promise<User[]> {
+  async find(@Req() req: ExpressRequest): Promise<User[]> {
+    console.log(req.user);
     return await this.usersService.find();
   }
 
