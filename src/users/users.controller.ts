@@ -42,7 +42,7 @@ import { isUUID } from 'class-validator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('user')
-//@UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 @ApiTags('User')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

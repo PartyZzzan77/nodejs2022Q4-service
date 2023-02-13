@@ -38,6 +38,7 @@ import { DeleteResult } from 'typeorm';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('artist')
+@UseGuards(AuthGuard)
 @ApiTags('Artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}

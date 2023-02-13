@@ -35,6 +35,7 @@ import {
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('favs')
+@UseGuards(AuthGuard)
 @ApiTags('Favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}

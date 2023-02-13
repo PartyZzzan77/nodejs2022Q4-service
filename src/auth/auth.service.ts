@@ -26,9 +26,20 @@ export class AuthService {
   }
 
   public async getUser(loginDto: AddUserDto) {
-    const user = await this.usersRepository.findOneBy({
-      login: loginDto.login,
+    const users = await this.usersRepository.find({
+      where: { login: loginDto.login },
     });
+
+    const userTarget = await Promise.all(
+      users.map(async (user) => {
+        const isPass = await compare(loginDto.password, user.password);
+        if (isPass) {
+          return user;
+        }
+      }),
+    );
+
+    const user = userTarget.find((u) => u);
 
     if (!user) {
       return null;
@@ -42,7 +53,7 @@ export class AuthService {
     if (!isValidPassword) {
       return null;
     }
-    return user;
+    return user as any;
   }
 
   public async generateJWT(user: User): Promise<Tokens> {

@@ -40,7 +40,7 @@ export class AppModule {
           method: RequestMethod.ALL,
         },
         {
-          path: 'auth',
+          path: 'auth/*',
           method: RequestMethod.ALL,
         },
         {

@@ -35,8 +35,10 @@ import {
 } from '../users/Entities/user.entitie';
 import { isUUID } from 'class-validator';
 import { DeleteResult } from 'typeorm';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('track')
+@UseGuards(AuthGuard)
 @ApiTags('Track')
 export class TracksController {
   constructor(private readonly trackService: TracksService) {}
