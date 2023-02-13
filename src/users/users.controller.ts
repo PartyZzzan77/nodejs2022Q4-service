@@ -1,5 +1,4 @@
 import {
-  Req,
   Controller,
   Get,
   Param,
@@ -39,7 +38,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isUUID } from 'class-validator';
-import { ExpressRequest } from '../types/express-request.interface';
 
 @Controller('user')
 @ApiTags('User')
@@ -49,8 +47,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [User] })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async find(@Req() req: ExpressRequest): Promise<User[]> {
-    console.log(req.user);
+  async find(): Promise<User[]> {
     return await this.usersService.find();
   }
 
@@ -87,7 +84,6 @@ export class UsersController {
     description: 'Bad request. body does not contain required fields',
   })
   @UseInterceptors(ClassSerializerInterceptor)
-  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddUserDto): Promise<User> {
     return await this.usersService.create(dto);
