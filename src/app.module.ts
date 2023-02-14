@@ -16,10 +16,13 @@ import { AlbumsController } from './albums/albums.controller';
 import { ArtistsController } from './artists/artists.controller';
 import { FavoritesController } from './favorites/favorites.controller';
 import { AuthGuard } from './auth/guards/auth.guard';
+import { LoggerModule } from './logger/loger.module';
+import { LoggerMiddleware } from './logger/middlewares/logger.middleware';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
+    LoggerModule,
     UsersModule,
     AlbumsModule,
     TracksModule,
@@ -55,5 +58,6 @@ export class AppModule {
         ArtistsController,
         FavoritesController,
       );
+    consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
