@@ -2,7 +2,7 @@ import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
 import * as process from 'process';
 import 'dotenv/config';
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
-import { appendFile, stat } from 'node:fs/promises';
+import { appendFile, stat, readdir } from 'node:fs/promises';
 import * as path from 'node:path';
 
 const LEVEL = process.env.LOG_LEVEL as LogLevel;
@@ -14,10 +14,6 @@ const logDir = path.join(LOGS_FOLDER + '/log');
 const warnDir = path.join(LOGS_FOLDER + '/warn');
 const errorDir = path.join(LOGS_FOLDER + '/error');
 
-let logCounter = 1;
-let warnCounter = 1;
-let errorCounter = 1;
-
 @Injectable({ scope: Scope.TRANSIENT })
 export class Logger extends ConsoleLogger {
   constructor() {
@@ -25,9 +21,9 @@ export class Logger extends ConsoleLogger {
     this.setContext('App');
 
     this.initLogsDir(logsDir);
-    this.initLogsDir(logDir, true, `/${logCounter}.log.txt`);
-    this.initLogsDir(warnDir, true, `/${warnCounter}.log.txt`);
-    this.initLogsDir(errorDir, true, `/${errorCounter}.log.txt`);
+    this.initLogsDir(logDir, true, `/1.log.txt`);
+    this.initLogsDir(warnDir, true, `/1.log.txt`);
+    this.initLogsDir(errorDir, true, `/1.log.txt`);
 
     process.on('uncaughtException', async (err) => {
       await this.error(`Uncaught Exception: ${err.message}`, err.stack);
@@ -39,8 +35,9 @@ export class Logger extends ConsoleLogger {
   }
   async log(message: any) {
     super.log(message);
+    const { length } = await this.getFolderLength(logDir);
 
-    const pathDist = path.join(`${logDir}/${logCounter}.log.txt`);
+    const pathDist = path.join(`${logDir}/${length}.log.txt`);
 
     await this.checkFileSize(pathDist, 'logCounter');
 
@@ -49,8 +46,9 @@ export class Logger extends ConsoleLogger {
 
   async warn(message: any) {
     super.warn(message);
+    const length = await this.getFolderLength(warnDir);
 
-    const pathDist = path.join(`${warnDir}/${warnCounter}.log.txt`);
+    const pathDist = path.join(`${warnDir}/${length}.log.txt`);
 
     await this.checkFileSize(pathDist, 'warnCounter');
 
@@ -59,8 +57,9 @@ export class Logger extends ConsoleLogger {
 
   async error(message: any, stack?: any, context?: string) {
     super.error(message, stack, context);
+    const length = await this.getFolderLength(errorDir);
 
-    const pathDist = path.join(`${errorDir}/${errorCounter}.log.txt`);
+    const pathDist = path.join(`${errorDir}/${length}.log.txt`);
 
     await this.checkFileSize(pathDist, 'errorCounter');
 
@@ -93,22 +92,30 @@ export class Logger extends ConsoleLogger {
       const msg = `\n${new Date().toISOString()} - init new log file`;
 
       if (counterName === 'logCounter') {
-        logCounter += 1;
-        const pathDist = path.join(`${logDir}/${logCounter}.log.txt`);
+        const { length } = await this.getFolderLength(logDir);
+        const pathDist = path.join(`${logDir}/${length + 1}.log.txt`);
 
         await appendFile(pathDist, msg);
+        return;
       } else if (counterName === 'warnCounter') {
-        const pathDist = path.join(`${warnDir}/${warnCounter}.log.txt`);
-        warnCounter += 1;
+        const { length } = await this.getFolderLength(warnDir);
+        const pathDist = path.join(`${warnDir}/${length + 1}.log.txt`);
 
         await appendFile(pathDist, msg);
+        return;
       } else {
-        const pathDist = path.join(`${errorDir}/${warnCounter}.log.txt`);
-        errorCounter += 1;
+        const { length } = await this.getFolderLength(errorDir);
+        const pathDist = path.join(`${errorDir}/${length + 1}.log.txt`);
 
         await appendFile(pathDist, msg);
+        return;
       }
     }
+  }
+
+  private async getFolderLength(folderName: string) {
+    const { length } = await readdir(folderName);
+    return { length };
   }
 
   private async writeLog(fileDist, message) {
