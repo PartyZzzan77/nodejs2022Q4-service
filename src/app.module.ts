@@ -22,13 +22,13 @@ import { LoggerMiddleware } from './logger/middlewares/logger.middleware';
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
-    LoggerModule,
     UsersModule,
     AlbumsModule,
     TracksModule,
     ArtistsModule,
     FavoritesModule,
     AuthModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

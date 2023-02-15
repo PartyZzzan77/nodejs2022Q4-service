@@ -3,16 +3,16 @@ import { AppModule } from './app.module';
 import { config } from 'dotenv';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger } from './logger/logger';
+import * as process from 'process';
 config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+  const port = +process.env.PORT || 4000;
 
   app.useLogger(new Logger());
-
-  const port = +process.env.PORT || 4000;
 
   const config = new DocumentBuilder()
     .setTitle('REST Service')
