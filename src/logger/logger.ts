@@ -1,7 +1,8 @@
 import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
 import * as process from 'process';
 import 'dotenv/config';
-import { appendFileSync, existsSync, mkdir } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFile, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 
 const LEVEL = process.env.LOG_LEVEL as LogLevel;
@@ -13,10 +14,9 @@ const logDir = path.join(LOGS_FOLDER + '/log');
 const warnDir = path.join(LOGS_FOLDER + '/warn');
 const errorDir = path.join(LOGS_FOLDER + '/error');
 
-const fileSize = MAX_FILE_SIZE;
-const logCounter = 1;
-const warnCounter = 1;
-const errorCounter = 1;
+let logCounter = 1;
+let warnCounter = 1;
+let errorCounter = 1;
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class Logger extends ConsoleLogger {
@@ -29,27 +29,50 @@ export class Logger extends ConsoleLogger {
     this.initLogsDir(warnDir, true, `/${warnCounter}.log.txt`);
     this.initLogsDir(errorDir, true, `/${errorCounter}.log.txt`);
 
-    process.on('uncaughtException', (err) => {
-      this.error(`Uncaught Exception: ${err.message}`, err.stack);
-      process.exit(1);
+    process.on('uncaughtException', async (err) => {
+      await this.error(`Uncaught Exception: ${err.message}`, err.stack);
     });
 
-    process.on('unhandledRejection', (reason, promise) => {
-      this.error(`Unhandled Rejection: ${reason}`, promise);
-      process.exit(1);
+    process.on('unhandledRejection', async (reason, promise) => {
+      await this.error(`Unhandled Rejection: ${reason}`, promise);
     });
   }
   async log(message: any) {
     super.log(message);
+
+    const pathDist = path.join(`${logDir}/${logCounter}.log.txt`);
+
+    await this.checkFileSize(pathDist, 'logCounter');
+
+    await this.writeLog(pathDist, message);
+  }
+
+  async warn(message: any) {
+    super.warn(message);
+
+    const pathDist = path.join(`${warnDir}/${warnCounter}.log.txt`);
+
+    await this.checkFileSize(pathDist, 'warnCounter');
+
+    await this.writeLog(pathDist, message);
+  }
+
+  async error(message: any, stack?: any, context?: string) {
+    super.error(message, stack, context);
+
+    const pathDist = path.join(`${errorDir}/${errorCounter}.log.txt`);
+
+    await this.checkFileSize(pathDist, 'errorCounter');
+
+    await this.writeLog(
+      pathDist,
+      `message: >>>${message}<<< - stack: [${stack}]`,
+    );
   }
 
   private initLogsDir(dist, isFile = false, file = '') {
     if (!existsSync(dist)) {
-      mkdir(dist, (err) => {
-        if (err) {
-          return;
-        }
-      });
+      mkdirSync(dist);
     }
     if (isFile) {
       const fileDist = path.join(dist + file);
@@ -57,8 +80,44 @@ export class Logger extends ConsoleLogger {
       if (existsSync(fileDist)) {
         return;
       }
+      const msg = `\n${new Date().toISOString()} - init`;
 
-      appendFileSync(fileDist, `\n${new Date().toISOString()} - init`);
+      appendFileSync(fileDist, msg);
+    }
+  }
+
+  private async checkFileSize(fileDist, counterName) {
+    const { size } = await stat(fileDist);
+
+    if (size >= MAX_FILE_SIZE) {
+      const msg = `\n${new Date().toISOString()} - init new log file`;
+
+      if (counterName === 'logCounter') {
+        logCounter += 1;
+        const pathDist = path.join(`${logDir}/${logCounter}.log.txt`);
+
+        await appendFile(pathDist, msg);
+      } else if (counterName === 'warnCounter') {
+        const pathDist = path.join(`${warnDir}/${warnCounter}.log.txt`);
+        warnCounter += 1;
+
+        await appendFile(pathDist, msg);
+      } else {
+        const pathDist = path.join(`${errorDir}/${warnCounter}.log.txt`);
+        errorCounter += 1;
+
+        await appendFile(pathDist, msg);
+      }
+    }
+  }
+
+  private async writeLog(fileDist, message) {
+    try {
+      const msg = `\n${new Date().toISOString()} - ${JSON.stringify(message)}`;
+
+      await appendFile(fileDist, msg);
+    } catch (err) {
+      console.error(err);
     }
   }
 }
