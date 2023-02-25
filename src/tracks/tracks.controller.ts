@@ -97,6 +97,7 @@ export class TracksController {
     type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
   })
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddTrackDto): Promise<Track> {
     return await this.trackService.create(dto);

@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { IsUUID } from 'class-validator';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 import { Track } from '../../tracks/Entities/track.entitie';
+import { Album } from '../../albums/Entities/album.entities';
 
 @Entity({ name: 'artists' })
 export class Artist {
@@ -11,12 +12,17 @@ export class Artist {
   id: string;
 
   @ApiProperty({ example: 'Prodigy' })
+  @IsString()
   @Column({ nullable: true })
   name: string;
 
   @ApiProperty({ example: true })
+  @IsBoolean()
   @Column({ nullable: true })
   grammy: boolean;
+
+  @OneToMany(() => Album, (album) => album.artist)
+  albums: Album[];
 
   @OneToMany(() => Track, (track: Track) => track.artistId, {
     onDelete: 'SET NULL',

@@ -25,7 +25,8 @@
     "db:revert": "npm run typeorm -- migration:revert",
     "db:drop": "npm run typeorm schema:drop",
     "docker:build": "docker-compose up --build",
-    "docker:test": "docker exec app npm run test ",
+    "docker:test": "docker exec app npm run test",
+    "docker:test-auth": "docker exec app npm run test:auth",
     "docker:scan": "docker scan app/partyzzzan77:app && docker scan app/postgres:postgres"
   },
   "dependencies": {

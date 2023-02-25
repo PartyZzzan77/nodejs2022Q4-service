@@ -1,4 +1,4 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Album } from '../../albums/Entities/album.entities';
@@ -13,10 +13,12 @@ export class Track {
   id: string;
 
   @ApiProperty({ example: 'Breathe' })
+  @IsString()
   @Column({ nullable: true })
   name: string;
 
   @ApiProperty({ example: 214 })
+  @IsNumber()
   @Column({ nullable: true })
   duration: number;
 

@@ -87,6 +87,7 @@ export class UsersController {
     description: 'Bad request. body does not contain required fields',
   })
   @UseInterceptors(ClassSerializerInterceptor)
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddUserDto): Promise<User> {
     return await this.usersService.create(dto);

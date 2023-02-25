@@ -100,6 +100,7 @@ export class AlbumsController {
     type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
   })
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddAlbumDto) {
     return this.albumsService.create(dto);

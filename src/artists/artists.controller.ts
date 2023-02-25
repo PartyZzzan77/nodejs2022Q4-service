@@ -100,6 +100,7 @@ export class ArtistsController {
     type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
   })
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddArtistDto): Promise<Artist> {
     return this.artistsService.create(dto);
