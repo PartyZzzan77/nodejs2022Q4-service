@@ -8,14 +8,14 @@ export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly logger: Logger) {}
 
   public async use(req: ExpressRequest, res: Response, next: NextFunction) {
-    const { url, params, body } = req;
-    const { statusCode } = res;
-
-    const msg = `➡️ url: ${url} params: ${JSON.stringify(
-      params,
-    )} body: ${JSON.stringify(body)} CODE: ${statusCode}`;
-
-    await this.logger.log(msg);
+    res.on('finish', async () => {
+      const { url, params, body } = req;
+      const { statusCode } = res;
+      const msg = `➡️ url: ${url} params: ${JSON.stringify(
+        params,
+      )} body: ${JSON.stringify(body)} CODE: ${statusCode}`;
+      await this.logger.log(msg);
+    });
 
     next();
   }
