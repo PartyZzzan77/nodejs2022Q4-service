@@ -22,7 +22,15 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('rs school api')
     .addServer(`http://localhost:${port}`)
-    .addBasicAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'JWT',
+        description: 'JWT without Bearer prefix and ""',
+      },
+      'JWT',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

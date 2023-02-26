@@ -21,6 +21,7 @@ import { Constants } from '../constants';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiNotFoundResponse,
   ApiOperation,
@@ -40,6 +41,7 @@ import { DeleteResult } from 'typeorm';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('artist')
+@ApiBearerAuth('JWT')
 @UseGuards(AuthGuard)
 @ApiTags('Artist')
 export class ArtistsController {

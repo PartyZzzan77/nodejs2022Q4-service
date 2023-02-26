@@ -31,6 +31,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Constants } from '../constants';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiForbiddenResponse,
@@ -44,6 +45,7 @@ import { isUUID } from 'class-validator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('user')
+@ApiBearerAuth('JWT')
 @UseGuards(AuthGuard)
 @ApiTags('User')
 export class UsersController {

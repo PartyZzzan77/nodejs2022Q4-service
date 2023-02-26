@@ -21,6 +21,7 @@ import { AddTrackDto } from './dto/add-track.dto';
 import { Constants } from '../constants';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiNotFoundResponse,
   ApiOperation,
@@ -40,6 +41,7 @@ import { DeleteResult } from 'typeorm';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('track')
+@ApiBearerAuth('JWT')
 @UseGuards(AuthGuard)
 @ApiTags('Track')
 export class TracksController {

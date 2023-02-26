@@ -20,6 +20,7 @@ import { ArtistDtoId } from '../artists/dto/artist-id.dto';
 import { Constants } from '../constants';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
@@ -36,6 +37,7 @@ import {
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('favs')
+@ApiBearerAuth('JWT')
 @UseGuards(AuthGuard)
 @ApiTags('Favorites')
 export class FavoritesController {

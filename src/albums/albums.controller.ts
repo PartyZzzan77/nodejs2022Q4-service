@@ -21,6 +21,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Constants } from '../constants';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiNotFoundResponse,
   ApiOperation,
@@ -40,6 +41,7 @@ import { DeleteResult } from 'typeorm';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('album')
+@ApiBearerAuth('JWT')
 @UseGuards(AuthGuard)
 @ApiTags('Album')
 export class AlbumsController {
