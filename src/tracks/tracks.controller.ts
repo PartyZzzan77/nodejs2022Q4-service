@@ -26,12 +26,14 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Track } from './Entities/track.entitie';
 import {
   BadRequestUUID,
   NotFound,
   RequiredFields,
+  RequiredToken,
 } from '../users/Entities/user.entitie';
 import { isUUID } from 'class-validator';
 import { DeleteResult } from 'typeorm';
@@ -48,6 +50,10 @@ export class TracksController {
     status: 200,
     type: [Track],
     description: 'Successful operation',
+  })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
   })
   @Get()
   async find(): Promise<Track[]> {
@@ -68,6 +74,10 @@ export class TracksController {
     description: 'Bad request. TackId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found.' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
     if (!isUUID(id, 4)) {
@@ -97,6 +107,10 @@ export class TracksController {
     type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddTrackDto): Promise<Track> {
@@ -118,6 +132,10 @@ export class TracksController {
     description: 'Bad request. trackId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Put(':id')
   @UsePipes(new ValidationPipe())
   async update(
@@ -146,6 +164,10 @@ export class TracksController {
     description: 'Bad request. trackId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Delete(':id')
   @UsePipes(new ValidationPipe())
   @HttpCode(204)

@@ -26,12 +26,14 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Artist } from './Entities/atrtist.entities';
 import {
   BadRequestUUID,
   NotFound,
   RequiredFields,
+  RequiredToken,
 } from '../users/Entities/user.entitie';
 import { isUUID } from 'class-validator';
 import { DeleteResult } from 'typeorm';
@@ -52,6 +54,10 @@ export class ArtistsController {
     type: [Artist],
     description: 'Successful operation',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Get()
   async find(): Promise<Artist[]> {
     return await this.artistsService.find();
@@ -71,6 +77,10 @@ export class ArtistsController {
     description: 'Bad request. artistId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found.' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Artist> {
     if (!isUUID(id, 4)) {
@@ -100,6 +110,10 @@ export class ArtistsController {
     type: RequiredFields,
     description: 'Bad request. body does not contain required fields',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() dto: AddArtistDto): Promise<Artist> {
@@ -121,6 +135,10 @@ export class ArtistsController {
     description: 'Bad request. artistId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Put(':id')
   @UsePipes(new ValidationPipe())
   async update(
@@ -149,6 +167,10 @@ export class ArtistsController {
     description: 'Bad request. artistId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Delete(':id')
   @UsePipes(new ValidationPipe())
   @HttpCode(204)

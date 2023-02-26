@@ -30,6 +30,7 @@ import {
 import {
   BadRequestUUID,
   NotFound,
+  RequiredToken,
   Unprocessable,
 } from '../users/Entities/user.entitie';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -49,6 +50,10 @@ export class FavoritesController {
     description: 'Successful operation',
   })
   @ApiUnauthorizedResponse({
+    description: 'Access token is missing or invalid',
+  })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
     description: 'Access token is missing or invalid',
   })
   @Get()
@@ -73,6 +78,10 @@ export class FavoritesController {
     type: Unprocessable,
     description: 'Track not found',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Post('track/:id')
   @UsePipes(new ValidationPipe())
   async addTrack(@Param() { id }: TrackDtoId, @Res() res) {
@@ -96,6 +105,10 @@ export class FavoritesController {
   @ApiBadRequestResponse({
     type: BadRequestUUID,
     description: 'Bad request. trackId is invalid (not uuid)',
+  })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Track not found' })
   @Delete('track/:id')
@@ -126,6 +139,10 @@ export class FavoritesController {
     type: Unprocessable,
     description: 'Album not found',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Post('album/:id')
   @UsePipes(new ValidationPipe())
   async addAlbum(@Param() { id }: AlbumDtoId, @Res() res) {
@@ -151,6 +168,10 @@ export class FavoritesController {
     description: 'Bad request. albumId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Album not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Delete('album/:id')
   @UsePipes(new ValidationPipe())
   @HttpCode(204)
@@ -179,6 +200,10 @@ export class FavoritesController {
     type: Unprocessable,
     description: 'Artist not found',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Post('artist/:id')
   @UsePipes(new ValidationPipe())
   async addArtist(@Param() { id }: ArtistDtoId, @Res() res) {
@@ -204,6 +229,10 @@ export class FavoritesController {
     description: 'Bad request. artistId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'Artist not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @Delete('artist/:id')
   @UsePipes(new ValidationPipe())
   @HttpCode(204)

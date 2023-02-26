@@ -21,6 +21,7 @@ import {
   BadRequestUUID,
   Invalid,
   NotFound,
+  RequiredToken,
   User,
 } from './Entities/user.entitie';
 import { UsersService } from './users.service';
@@ -37,6 +38,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { isUUID } from 'class-validator';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -48,6 +50,10 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @ApiOperation({ summary: 'Gets all users' })
   @ApiResponse({ status: 200, type: [User] })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   async find(): Promise<User[]> {
@@ -61,6 +67,10 @@ export class UsersController {
     description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
@@ -86,6 +96,10 @@ export class UsersController {
     type: BadRequestUUID,
     description: 'Bad request. body does not contain required fields',
   })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe())
   @Post()
@@ -106,6 +120,10 @@ export class UsersController {
   })
   @ApiForbiddenResponse({ type: Invalid, description: 'oldPassowrd is wrong' })
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @UsePipes(new ValidationPipe())
@@ -135,6 +153,10 @@ export class UsersController {
   })
   @ApiForbiddenResponse({ type: Invalid, description: 'oldPassowrd is wrong' })
   @ApiNotFoundResponse({ type: NotFound, description: 'User not found' })
+  @ApiUnauthorizedResponse({
+    type: RequiredToken,
+    description: 'Access token is missing or invalid',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   @UsePipes(new ValidationPipe())
