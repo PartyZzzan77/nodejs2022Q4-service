@@ -46,7 +46,7 @@ export class Logger extends ConsoleLogger {
 
   async warn(message: any) {
     super.warn(message);
-    const length = await this.getFolderLength(warnDir);
+    const { length } = await this.getFolderLength(warnDir);
 
     const pathDist = path.join(`${warnDir}/${length}.log.txt`);
 
@@ -57,7 +57,7 @@ export class Logger extends ConsoleLogger {
 
   async error(message: any, stack?: any, context?: string) {
     super.error(message, stack, context);
-    const length = await this.getFolderLength(errorDir);
+    const { length } = await this.getFolderLength(errorDir);
 
     const pathDist = path.join(`${errorDir}/${length}.log.txt`);
 
