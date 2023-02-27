@@ -10,9 +10,11 @@
 
 ⚠️ Please rename the **evn.exapmle** file
 
-⚠️ To test a **hot reload**, make changes to any file in the `src` directory the container will react 🐳
+⚠️ In case you are having trouble assembling the Docker container, try clearing the cache
 
-
+```md
+docker builder prune
+```
 **To start up application, do the following**
 ```md
 git clone https://github.com/PartyZzzan77/nodejs2022Q4-service.git
@@ -21,18 +23,24 @@ git clone https://github.com/PartyZzzan77/nodejs2022Q4-service.git
 cd nodejs2022Q4-service
 ```
 ```md
-git checkout db
+git checkout auth
 ```
 ```md
 rename the **evn.exapmle** file
 ```
 ```md
+npm i
+```
+```md
 npm run docker:build
 ```
-### Testing
-
 ```md
-npm run docker:test
+npm run docker:test-auth
+```
+
+⚠️ You can also run the tests simply from the console outside the docker
+```md
+npm run test:auth -- --runInBand
 ```
 ### ⚠️ To connect to the database via the graphical interface, use the following parameters
 
